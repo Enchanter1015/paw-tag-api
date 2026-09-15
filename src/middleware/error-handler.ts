@@ -1,10 +1,22 @@
-import { StatusCodes, getReasonPhrase } from 'http-status-codes';
+import type { ErrorRequestHandler } from 'express';
+import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
 
 import { config } from '../config/index.js';
 import { AppError } from '../lib/errors.js';
 
-const normalize = (err) => {
+interface NormalizedError {
+  statusCode: number;
+  code: string;
+  message: string;
+  details?: unknown;
+}
+
+interface HttpLikeError extends Error {
+  status?: number;
+}
+
+const normalize = (err: unknown): NormalizedError => {
   if (err instanceof AppError) {
     return {
       statusCode: err.statusCode,
@@ -24,11 +36,12 @@ const normalize = (err) => {
   }
 
   // Body-parser / express errors carry a status property.
-  if (typeof err?.status === 'number' && err.status >= 400 && err.status < 500) {
+  const httpErr = err as HttpLikeError;
+  if (typeof httpErr?.status === 'number' && httpErr.status >= 400 && httpErr.status < 500) {
     return {
-      statusCode: err.status,
+      statusCode: httpErr.status,
       code: 'BAD_REQUEST',
-      message: getReasonPhrase(err.status),
+      message: getReasonPhrase(httpErr.status),
     };
   }
 
@@ -39,14 +52,13 @@ const normalize = (err) => {
   };
 };
 
-// eslint-disable-next-line no-unused-vars -- Express identifies error middleware by arity.
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   const { statusCode, code, message, details } = normalize(err);
 
   if (statusCode >= StatusCodes.INTERNAL_SERVER_ERROR) {
     req.log?.error({ err }, 'Unhandled request error');
   } else {
-    req.log?.warn({ err: { message: err?.message, code } }, 'Request error');
+    req.log?.warn({ err: { message: (err as Error)?.message, code } }, 'Request error');
   }
 
   res.status(statusCode).json({
@@ -55,7 +67,7 @@ export const errorHandler = (err, req, res, next) => {
       message,
       ...(details ? { details } : {}),
       requestId: req.id,
-      ...(config.isProduction ? {} : { stack: err?.stack }),
+      ...(config.isProduction ? {} : { stack: (err as Error)?.stack }),
     },
   });
 };

@@ -1,7 +1,7 @@
 # Plan: Postgres (Prisma) + TypeScript for paw-tag-api
 
-Status: proposed — not yet implemented.
-Last updated: 2026-09-14
+Status: in progress — Phase 1 complete, Phases 2-7 not yet implemented.
+Last updated: 2026-09-16
 
 ## Locked decisions
 
@@ -47,7 +47,7 @@ Decoded from `pawtag-20260914-104111.dump` (PostgreSQL 18.6). Extension: `pgcryp
 
 Every table has `created_at timestamptz DEFAULT now()`. **None have `updated_at`.**
 
-## Phase 1 — TypeScript conversion (blocks everything)
+## Phase 1 — TypeScript conversion (blocks everything) — ✅ Done (2026-09-16)
 
 1. Dev deps: `typescript`, `tsx`, `@types/node`, `@types/express`, `@types/cors`,
    `@types/compression`, `@types/supertest`, `typescript-eslint`.

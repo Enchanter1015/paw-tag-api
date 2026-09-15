@@ -12,7 +12,7 @@ const server = app.listen(config.server.port, config.server.host, () => {
 
 let shuttingDown = false;
 
-const shutdown = (signal) => {
+const shutdown = (signal: string): void => {
   if (shuttingDown) return;
   shuttingDown = true;
   logger.info({ signal }, 'Shutting down');
