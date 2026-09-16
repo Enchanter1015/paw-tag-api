@@ -13,10 +13,10 @@ if (scenario === 'unhandled-rejection' || scenario === 'uncaught-exception') {
   setTimeout(() => {
     switch (scenario) {
       case 'unhandled-rejection':
-        process.emit('unhandledRejection', new Error('boom'), Promise.resolve());
+        Promise.reject(new Error('boom'));
         break;
       case 'uncaught-exception':
-        process.emit('uncaughtException', new Error('boom'));
+        throw new Error('boom');
         break;
       default:
         break;
