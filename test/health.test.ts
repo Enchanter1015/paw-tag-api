@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 const { createApp } = await import('../src/app.js');
 
 describe('GET /api/v1/health', () => {
-  let app;
+  let app: ReturnType<typeof createApp>;
 
   before(() => {
     app = createApp();
