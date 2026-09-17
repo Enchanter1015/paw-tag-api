@@ -10,3 +10,8 @@ export const registerAnimal = asyncHandler(async (req: Request, res: Response) =
   const animal = await animalsService.register(body, req.actorId!);
   res.status(StatusCodes.CREATED).json(animal);
 });
+
+export const getAnimal = asyncHandler(async (req: Request, res: Response) => {
+  const animal = await animalsService.getById(req.params.id!);
+  res.status(StatusCodes.OK).json(animal);
+});
