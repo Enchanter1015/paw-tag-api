@@ -138,7 +138,7 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `feat(animals): GET /animals/:id controller + route`
    - `test(animals): 404 on unknown id, field-shape test per role placeholder`
 
-4. **PR 4 — SCRUM-27 Update dog information API** *(depends on PR 2)*
+4. **PR 4 — SCRUM-27 Update dog information API** *(depends on PR 2)* - Done
    - `feat(animals): zod schema for partial update`
    - `feat(animals): repository.update + service (touches updated_at)`
    - `feat(animals): PATCH /animals/:id controller + route`

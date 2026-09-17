@@ -13,3 +13,10 @@ export const createAnimalSchema = z.object({
 });
 
 export type CreateAnimalInput = z.infer<typeof createAnimalSchema>;
+
+export const updateAnimalSchema = createAnimalSchema
+  .pick({ name: true, dob: true, animalTypeId: true, breed: true, isStreet: true })
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, { message: 'At least one field is required' });
+
+export type UpdateAnimalInput = z.infer<typeof updateAnimalSchema>;

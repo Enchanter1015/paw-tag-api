@@ -1,4 +1,4 @@
-import type { CreateAnimalInput } from './animals.schema.js';
+import type { CreateAnimalInput, UpdateAnimalInput } from './animals.schema.js';
 import { animalsRepository } from './animals.repository.js';
 import { NotFoundError } from '../../lib/errors.js';
 
@@ -12,5 +12,9 @@ export const animalsService = {
       throw new NotFoundError(`Animal ${id} not found`);
     }
     return animal;
+  },
+  update: async (id: string, input: UpdateAnimalInput) => {
+    // P2025 (not found) is mapped to 404 by the global error handler.
+    return animalsRepository.update(id, input);
   },
 };

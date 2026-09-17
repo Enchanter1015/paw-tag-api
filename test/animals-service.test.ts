@@ -28,3 +28,18 @@ describe('animalsService.getById', () => {
     findById.mock.restore();
   });
 });
+
+describe('animalsService.update', () => {
+  it('delegates to the repository with the given id and fields', async () => {
+    const updated = { id: 'abcd1234', name: 'Rex Updated' };
+    const update = mock.method(animalsRepository, 'update', async () => updated);
+
+    const result = await animalsService.update('abcd1234', { name: 'Rex Updated' });
+
+    assert.equal(update.mock.calls[0]!.arguments[0], 'abcd1234');
+    assert.deepEqual(update.mock.calls[0]!.arguments[1], { name: 'Rex Updated' });
+    assert.deepEqual(result, updated);
+
+    update.mock.restore();
+  });
+});
