@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export const animalIdParamsSchema = z.object({
+  id: z.string().trim().length(8),
+});
+
 export const createAnimalSchema = z.object({
   name: z.string().trim().min(1).max(100),
   dob: z.coerce.date().optional(),

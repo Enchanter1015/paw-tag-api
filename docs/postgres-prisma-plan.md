@@ -133,7 +133,7 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `feat(animals): POST /animals controller + route`
    - `test(animals): required-field validation errors, successful create returns generated id`
 
-3. **PR 3 — SCRUM-28 View dog information API** *(depends on PR 2)*
+3. **PR 3 — SCRUM-28 View dog information API** *(depends on PR 2)* - Done
    - `feat(animals): repository.findById + service`
    - `feat(animals): GET /animals/:id controller + route`
    - `test(animals): 404 on unknown id, field-shape test per role placeholder`

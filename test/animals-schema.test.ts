@@ -1,7 +1,17 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { createAnimalSchema } from '../src/modules/animals/animals.schema.js';
+import { animalIdParamsSchema, createAnimalSchema } from '../src/modules/animals/animals.schema.js';
+
+describe('animalIdParamsSchema', () => {
+  it('accepts an 8-char id', () => {
+    assert.equal(animalIdParamsSchema.safeParse({ id: 'abcd1234' }).success, true);
+  });
+
+  it('rejects an id of the wrong length', () => {
+    assert.equal(animalIdParamsSchema.safeParse({ id: 'abc' }).success, false);
+  });
+});
 
 describe('createAnimalSchema', () => {
   it('accepts a minimal valid payload', () => {
