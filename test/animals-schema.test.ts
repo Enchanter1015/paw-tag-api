@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { animalIdParamsSchema, createAnimalSchema } from '../src/modules/animals/animals.schema.js';
+import { animalIdParamsSchema, createAnimalSchema, updateAnimalSchema } from '../src/modules/animals/animals.schema.js';
 
 describe('animalIdParamsSchema', () => {
   it('accepts an 8-char id', () => {
@@ -38,5 +38,26 @@ describe('createAnimalSchema', () => {
     const result = createAnimalSchema.safeParse({ animalTypeId: 1 });
 
     assert.equal(result.success, false);
+  });
+});
+
+describe('updateAnimalSchema', () => {
+  it('accepts a partial update', () => {
+    const result = updateAnimalSchema.safeParse({ name: 'Rex' });
+
+    assert.equal(result.success, true);
+  });
+
+  it('rejects an empty body', () => {
+    const result = updateAnimalSchema.safeParse({});
+
+    assert.equal(result.success, false);
+  });
+
+  it('strips fields not permitted for update', () => {
+    const result = updateAnimalSchema.safeParse({ name: 'Rex', createdBy: 'abc' });
+
+    assert.equal(result.success, true);
+    assert.equal((result.data as { createdBy?: string }).createdBy, undefined);
   });
 });
