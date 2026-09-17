@@ -121,13 +121,13 @@ Each numbered item below is **one PR**, mapped to its Jira ticket (all currently
 Sub-bullets are the suggested commit sequence within that PR. PRs are ordered so each only
 depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earlier PR in this list.
 
-1. **PR 1 — lookups module** *(no ticket; prerequisite seed data for every module below)*
+1. **PR 1 — lookups module** *(no ticket; prerequisite seed data for every module below)* -  Done
    - `chore(lookups): add schema+repository+service+controller+routes for animal_type,
      medical_record_type, vet_hospital_type, role`
    - `feat(lookups): mount GET /animal-types, /medical-record-types, /vet-hospital-types, /roles`
    - `test(lookups): route + repository tests`
 
-2. **PR 2 — SCRUM-26 Register street dog API**
+2. **PR 2 — SCRUM-26 Register street dog API** - Done
    - `feat(animals): zod schema for create (sex, approx age, colour, location, description, photo)`
    - `feat(animals): repository.create + service (never accept client-supplied id)`
    - `feat(animals): POST /animals controller + route`
