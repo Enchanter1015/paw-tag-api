@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 
 process.env.NODE_ENV = 'test';
 
-const { getAnimal, registerAnimal, updateAnimal } = await import('../src/modules/animals/animals.controller.js');
+const { getAnimal, registerAnimal, searchAnimals, updateAnimal } = await import('../src/modules/animals/animals.controller.js');
 const { animalsService } = await import('../src/modules/animals/animals.service.js');
 
 const createRes = () => {
@@ -80,5 +80,27 @@ describe('updateAnimal', () => {
     assert.deepEqual(statusResult.json.mock.calls[0]!.arguments[0], animal);
 
     update.mock.restore();
+  });
+});
+
+describe('searchAnimals', () => {
+  it('responds 200 with the matching animals', async () => {
+    const results = [{ id: 'abcd1234', name: 'Rex' }];
+    const search = mock.method(animalsService, 'search', async () => results);
+
+    const req = { query: { query: 'Rex' } } as unknown as Request;
+    const res = createRes();
+
+    await searchAnimals(req, res, () => {});
+
+    assert.deepEqual(search.mock.calls[0]!.arguments[0], { query: 'Rex' });
+    assert.equal((res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.OK);
+
+    const statusResult = (res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.result as {
+      json: ReturnType<typeof mock.fn>;
+    };
+    assert.deepEqual(statusResult.json.mock.calls[0]!.arguments[0], results);
+
+    search.mock.restore();
   });
 });
