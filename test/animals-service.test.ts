@@ -5,7 +5,7 @@ process.env.NODE_ENV = 'test';
 
 const { animalsService } = await import('../src/modules/animals/animals.service.js');
 const { animalsRepository } = await import('../src/modules/animals/animals.repository.js');
-const { NotFoundError } = await import('../src/lib/errors.js');
+const { BadRequestError, NotFoundError } = await import('../src/lib/errors.js');
 
 describe('animalsService.getById', () => {
   it('returns the animal when found', async () => {
@@ -69,5 +69,67 @@ describe('animalsService.search', () => {
     assert.deepEqual(search.mock.calls[0]!.arguments[0], {});
 
     search.mock.restore();
+  });
+});
+
+describe('animalsService.remove', () => {
+  it('removes an existing animal', async () => {
+    const animal = { id: 'abcd1234', name: 'Rex' };
+    const findById = mock.method(animalsRepository, 'findById', async () => animal);
+    const remove = mock.method(animalsRepository, 'remove', async () => animal);
+
+    const result = await animalsService.remove('abcd1234', 'actor-1');
+
+    assert.equal(remove.mock.calls[0]!.arguments[0], 'abcd1234');
+    assert.deepEqual(result, animal);
+
+    findById.mock.restore();
+    remove.mock.restore();
+  });
+
+  it('throws NotFoundError instead of removing when missing', async () => {
+    const findById = mock.method(animalsRepository, 'findById', async () => null);
+    const remove = mock.method(animalsRepository, 'remove', async () => {
+      throw new Error('should not be called');
+    });
+
+    await assert.rejects(() => animalsService.remove('missing1', 'actor-1'), NotFoundError);
+
+    findById.mock.restore();
+    remove.mock.restore();
+  });
+});
+
+describe('animalsService.merge', () => {
+  it('rejects merging an animal into itself', async () => {
+    await assert.rejects(() => animalsService.merge('abcd1234', 'abcd1234', 'actor-1'), BadRequestError);
+  });
+
+  it('merges the source into the target and returns the deleted source', async () => {
+    const source = { id: 'abcd1234', name: 'Rex' };
+    const target = { id: 'wxyz5678', name: 'Rex Duplicate' };
+    const findById = mock.method(animalsRepository, 'findById', async (id: string) =>
+      id === source.id ? source : target,
+    );
+    const mergeInto = mock.method(animalsRepository, 'mergeInto', async () => source);
+
+    const result = await animalsService.merge('abcd1234', 'wxyz5678', 'actor-1');
+
+    assert.equal(mergeInto.mock.calls[0]!.arguments[0], 'abcd1234');
+    assert.equal(mergeInto.mock.calls[0]!.arguments[1], 'wxyz5678');
+    assert.deepEqual(result, source);
+
+    findById.mock.restore();
+    mergeInto.mock.restore();
+  });
+
+  it('throws NotFoundError when the target does not exist', async () => {
+    const findById = mock.method(animalsRepository, 'findById', async (id: string) =>
+      id === 'abcd1234' ? { id: 'abcd1234' } : null,
+    );
+
+    await assert.rejects(() => animalsService.merge('abcd1234', 'missing1', 'actor-1'), NotFoundError);
+
+    findById.mock.restore();
   });
 });

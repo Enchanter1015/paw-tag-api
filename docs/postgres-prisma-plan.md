@@ -151,7 +151,8 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `feat(animals): GET /animals?query=&lat=&lng=&radius= controller + route`
    - `test(animals): text-match results, location results ordered by proximity`
 
-6. **PR 6 — SCRUM-30 Administrator animal record management API** *(depends on PR 2, 4)*
+6. **PR 6 — SCRUM-30 Administrator animal record management API** *(depends on PR 2, 4)* - Done
+   (no audit-log table exists yet; audit trail is written via structured pino logs with actorId + timestamp)
    - `feat(animals): service.merge / service.remove with audit log (actor id + timestamp)`
    - `feat(animals): DELETE /animals/:id and POST /animals/:id/merge controller + routes`
    - `test(animals): merge/remove applies and is logged with actor identity`

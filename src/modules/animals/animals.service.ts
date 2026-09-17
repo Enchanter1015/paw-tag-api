@@ -2,7 +2,8 @@ import type { Prisma } from '@prisma/client';
 
 import type { CreateAnimalInput, SearchAnimalsQuery, UpdateAnimalInput } from './animals.schema.js';
 import { animalsRepository } from './animals.repository.js';
-import { NotFoundError } from '../../lib/errors.js';
+import { logger } from '../../lib/logger.js';
+import { BadRequestError, NotFoundError } from '../../lib/errors.js';
 
 export const animalsService = {
   // The 8-char id is DB-generated; clients never supply it.
@@ -31,5 +32,23 @@ export const animalsService = {
       where.isStreet = query.isStreet;
     }
     return animalsRepository.search(where);
+  },
+  remove: async (id: string, actorId: string) => {
+    await animalsService.getById(id);
+    const removed = await animalsRepository.remove(id);
+    logger.info({ actorId, animalId: id, action: 'remove' }, 'Administrator removed an animal record');
+    return removed;
+  },
+  merge: async (sourceId: string, targetId: string, actorId: string) => {
+    if (sourceId === targetId) {
+      throw new BadRequestError('Cannot merge an animal into itself');
+    }
+    await animalsService.getById(sourceId);
+    await animalsService.getById(targetId);
+
+    const merged = await animalsRepository.mergeInto(sourceId, targetId);
+
+    logger.info({ actorId, sourceId, targetId, action: 'merge' }, 'Administrator merged an animal record');
+    return merged;
   },
 };

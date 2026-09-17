@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { animalIdParamsSchema, createAnimalSchema, searchAnimalsQuerySchema, updateAnimalSchema } from '../src/modules/animals/animals.schema.js';
+import { animalIdParamsSchema, createAnimalSchema, mergeAnimalBodySchema, searchAnimalsQuerySchema, updateAnimalSchema } from '../src/modules/animals/animals.schema.js';
 
 describe('animalIdParamsSchema', () => {
   it('accepts an 8-char id', () => {
@@ -80,5 +80,15 @@ describe('searchAnimalsQuerySchema', () => {
 
     assert.equal(result.success, true);
     assert.equal(result.data?.isStreet, false);
+  });
+});
+
+describe('mergeAnimalBodySchema', () => {
+  it('accepts a valid 8-char targetId', () => {
+    assert.equal(mergeAnimalBodySchema.safeParse({ targetId: 'abcd1234' }).success, true);
+  });
+
+  it('rejects a missing targetId', () => {
+    assert.equal(mergeAnimalBodySchema.safeParse({}).success, false);
   });
 });
