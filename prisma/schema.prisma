@@ -16,6 +16,7 @@ model Animal {
   breed          String?         @db.VarChar(100)
   isStreet       Boolean         @default(false) @map("is_street")
   createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
   createdBy      String          @map("created_by") @db.Uuid
   animalType     AnimalType      @relation(fields: [animalTypeId], references: [id])
   creator        User            @relation(fields: [createdBy], references: [id])
@@ -51,11 +52,12 @@ model AnimalType {
 }
 
 model AnimalWeight {
-  id       Int      @id @default(autoincrement())
-  animalId String   @map("animal_id") @db.VarChar(8)
-  weight   Decimal  @db.Decimal(6, 2)
-  dateTime DateTime @map("date_time") @db.Timestamptz(6)
-  animal   Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  animalId  String   @map("animal_id") @db.VarChar(8)
+  weight    Decimal  @db.Decimal(6, 2)
+  dateTime  DateTime @map("date_time") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  animal    Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
   @@index([animalId, dateTime], map: "idx_animal_weight_animal_date")
   @@map("animal_weight")
@@ -69,6 +71,7 @@ model MedicalRecord {
   prescribedBy        String            @map("prescribed_by") @db.Uuid
   animalId            String            @map("animal_id") @db.VarChar(8)
   createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
   createdBy           String            @map("created_by") @db.Uuid
   animal              Animal            @relation(fields: [animalId], references: [id], onDelete: Cascade)
   creator             User              @relation(fields: [createdBy], references: [id])
@@ -107,6 +110,7 @@ model User {
   phoneNo                String?             @map("phone_no") @db.VarChar(20)
   address                String?             @db.VarChar(255)
   email                  String              @unique @db.VarChar(255)
+  updatedAt              DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
   animals                Animal[]
   animalOwners           AnimalOwner[]
   medicalRecords         MedicalRecord[]
@@ -126,6 +130,7 @@ model VetHospital {
   vetHospitalTypeId Int                 @map("vet_hospital_type_id")
   isVerified        Boolean             @default(false) @map("is_verified")
   createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
   createdBy         String              @map("created_by") @db.Uuid
   creator           User                @relation(fields: [createdBy], references: [id])
   vetHospitalType   VetHospitalType     @relation(fields: [vetHospitalTypeId], references: [id])
@@ -143,6 +148,7 @@ model VetHospitalMember {
   userId         String          @map("user_id") @db.Uuid
   roleId         Int             @map("role_id")
   joinedAt       DateTime        @default(now()) @map("joined_at") @db.Timestamptz(6)
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
   medicalRecords MedicalRecord[]
   role           Role            @relation(fields: [roleId], references: [id])
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
