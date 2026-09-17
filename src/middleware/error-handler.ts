@@ -1,9 +1,18 @@
+import { Prisma } from '@prisma/client';
 import type { ErrorRequestHandler } from 'express';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
 
 import { config } from '../config/index.js';
 import { AppError } from '../lib/errors.js';
+
+const PRISMA_KNOWN_REQUEST_STATUS: Record<string, number> = {
+  P2002: StatusCodes.CONFLICT,
+  P2025: StatusCodes.NOT_FOUND,
+  P2003: StatusCodes.BAD_REQUEST,
+};
+
+const PRISMA_UNAVAILABLE_CODES = new Set(['P1001', 'P1008', 'P1017']);
 
 interface NormalizedError {
   statusCode: number;
@@ -32,6 +41,34 @@ const normalize = (err: unknown): NormalizedError => {
       code: 'VALIDATION_ERROR',
       message: 'Request validation failed',
       details: err.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+    };
+  }
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (PRISMA_UNAVAILABLE_CODES.has(err.code)) {
+      return {
+        statusCode: StatusCodes.SERVICE_UNAVAILABLE,
+        code: 'DATABASE_UNAVAILABLE',
+        message: 'Database is not reachable',
+      };
+    }
+    const statusCode = PRISMA_KNOWN_REQUEST_STATUS[err.code];
+    if (statusCode) {
+      return {
+        statusCode,
+        code: `PRISMA_${err.code}`,
+        message: 'Database request failed',
+        // meta may contain column/table names; only surface outside production.
+        details: config.isProduction ? undefined : err.meta,
+      };
+    }
+  }
+
+  if (err instanceof Prisma.PrismaClientValidationError) {
+    return {
+      statusCode: StatusCodes.BAD_REQUEST,
+      code: 'PRISMA_VALIDATION_ERROR',
+      message: 'Invalid database request',
     };
   }
 

@@ -1,7 +1,7 @@
 # Plan: Postgres (Prisma) + TypeScript for paw-tag-api
 
-Status: in progress — Phase 1 complete, Phases 2-7 not yet implemented.
-Last updated: 2026-09-16
+Status: in progress — Phases 1-4 complete, Phases 5-7 not yet implemented.
+Last updated: 2026-09-17
 
 ## Locked decisions
 
@@ -62,7 +62,7 @@ Every table has `created_at timestamptz DEFAULT now()`. **None have `updated_at`
    `errorHandler` typed `ErrorRequestHandler`; `src/types/express.d.ts` declaration-merges
    `Request.id`, `Request.log` (pino-http) and `Request.actorId`.
 
-## Phase 2 — Prisma introspection + baseline (depends on 1)
+## Phase 2 — Prisma introspection + baseline (depends on 1) — ✅ Done (2026-09-17)
 
 1. Deps: `@prisma/client`; dev: `prisma`.
 2. `prisma db pull` against the live Layerbase DB to generate `prisma/schema.prisma`.
@@ -90,7 +90,7 @@ Every table has `created_at timestamptz DEFAULT now()`. **None have `updated_at`
 8. `src/db/connect.ts`: `connectWithRetry()` with exponential backoff for Layerbase's cold wake.
 9. `src/server.ts`: connect before `listen`; `$disconnect()` inside `shutdown()` after `server.close()`.
 
-## Phase 3 — DB-aware plumbing (depends on 2; items parallel)
+## Phase 3 — DB-aware plumbing (depends on 2; items parallel) — ✅ Done (2026-09-17)
 
 1. `src/db/transaction.ts`: `withTransaction(fn: (tx: Prisma.TransactionClient) => Promise<T>)`.
 2. Split health: `/api/v1/health` stays liveness (no DB);
@@ -103,7 +103,7 @@ Every table has `created_at timestamptz DEFAULT now()`. **None have `updated_at`
    sets `req.actorId`, else 401. Applied to write routes.
    Explicitly a temporary stand-in for real auth.
 
-## Phase 4 — `updated_at` migration (depends on 2)
+## Phase 4 — `updated_at` migration (depends on 2) — ✅ Done (2026-09-17)
 
 1. Add `updatedAt DateTime @updatedAt @map("updated_at")` to `animal`, `user`, `vet_hospital`,
    `medical_record`, `animal_weight`, `vet_hospital_member`.

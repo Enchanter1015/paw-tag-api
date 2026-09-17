@@ -10,6 +10,9 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
   SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
+  DATABASE_URL: z.string().startsWith('postgres'),
+  DB_CONNECT_RETRIES: z.coerce.number().int().positive().default(5),
+  DB_CONNECT_BACKOFF_MS: z.coerce.number().int().positive().default(500),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -39,5 +42,10 @@ export const config = Object.freeze({
   rateLimit: {
     windowMs: env.RATE_LIMIT_WINDOW_MS,
     max: env.RATE_LIMIT_MAX,
+  },
+  db: {
+    url: env.DATABASE_URL,
+    connectRetries: env.DB_CONNECT_RETRIES,
+    connectBackoffMs: env.DB_CONNECT_BACKOFF_MS,
   },
 } as const);
