@@ -127,30 +127,31 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `feat(lookups): mount GET /animal-types, /medical-record-types, /vet-hospital-types, /roles`
    - `test(lookups): route + repository tests`
 
-2. **PR 2 — SCRUM-26 Register street dog API** - Done
+2. **PR 2 — SCRUM-26 Register street animal API** - Done
    - `feat(animals): zod schema for create (sex, approx age, colour, location, description, photo)`
    - `feat(animals): repository.create + service (never accept client-supplied id)`
    - `feat(animals): POST /animals controller + route`
    - `test(animals): required-field validation errors, successful create returns generated id`
 
-3. **PR 3 — SCRUM-28 View dog information API** *(depends on PR 2)* - Done
+3. **PR 3 — SCRUM-28 View animal information API** *(depends on PR 2)* - Done
    - `feat(animals): repository.findById + service`
    - `feat(animals): GET /animals/:id controller + route`
    - `test(animals): 404 on unknown id, field-shape test per role placeholder`
 
-4. **PR 4 — SCRUM-27 Update dog information API** *(depends on PR 2)* - Done
+4. **PR 4 — SCRUM-27 Update animal information API** *(depends on PR 2)* - Done
    - `feat(animals): zod schema for partial update`
    - `feat(animals): repository.update + service (touches updated_at)`
    - `feat(animals): PATCH /animals/:id controller + route`
    - `test(animals): update persists, updated_at changes, rejects non-permitted fields`
 
-5. **PR 5 — SCRUM-29 Search dogs API (by identifier and by location)** *(depends on PR 2)*
+5. **PR 5 — SCRUM-29 Search animals API (by identifier and by location)** *(depends on PR 2)* - Done
+   (location/radius search deferred — see SCRUM-54 in "Deferred / out of scope" below; `animal` has no lat/lng columns yet)
    - `feat(animals): repository.search by id/name/description using idx_animal_name`
    - `feat(animals): location/radius search (lat/lng + radius params)`
    - `feat(animals): GET /animals?query=&lat=&lng=&radius= controller + route`
    - `test(animals): text-match results, location results ordered by proximity`
 
-6. **PR 6 — SCRUM-30 Administrator dog record management API** *(depends on PR 2, 4)*
+6. **PR 6 — SCRUM-30 Administrator animal record management API** *(depends on PR 2, 4)*
    - `feat(animals): service.merge / service.remove with audit log (actor id + timestamp)`
    - `feat(animals): DELETE /animals/:id and POST /animals/:id/merge controller + routes`
    - `test(animals): merge/remove applies and is logged with actor identity`
@@ -186,7 +187,7 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
     - `feat(medical-records): reuse add/update/view routes for treatment type`
     - `test(medical-records): stored with timestamp/provider/verification, chronological retrieval`
 
-12. **PR 12 — SCRUM-41 Dog health summary aggregation API** *(depends on PR 9, 10, 11)*
+12. **PR 12 — SCRUM-41 animal health summary aggregation API** *(depends on PR 9, 10, 11)*
     - `feat(animals): service.getHealthSummary aggregating latest vaccination/sterilisation/treatment`
     - `feat(animals): GET /animals/:id/health-summary controller + route`
     - `test(animals): summary reflects current status + most recent event date per category`

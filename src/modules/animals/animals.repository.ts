@@ -10,4 +10,6 @@ export const animalsRepository = {
   findById: (id: string, client: PrismaClientOrTx = prisma) => client.animal.findUnique({ where: { id } }),
   update: (id: string, data: Prisma.AnimalUncheckedUpdateInput, client: PrismaClientOrTx = prisma) =>
     client.animal.update({ where: { id }, data }),
+  search: (where: Prisma.AnimalWhereInput, client: PrismaClientOrTx = prisma) =>
+    client.animal.findMany({ where, orderBy: { name: 'asc' } }),
 };

@@ -43,3 +43,31 @@ describe('animalsService.update', () => {
     update.mock.restore();
   });
 });
+
+describe('animalsService.search', () => {
+  it('builds an OR filter on id/name for a text query and passes through other filters', async () => {
+    const results = [{ id: 'abcd1234', name: 'Rex' }];
+    const search = mock.method(animalsRepository, 'search', async () => results);
+
+    const result = await animalsService.search({ query: 'Rex', animalTypeId: 1, isStreet: true });
+
+    assert.deepEqual(search.mock.calls[0]!.arguments[0], {
+      OR: [{ id: 'Rex' }, { name: { contains: 'Rex', mode: 'insensitive' } }],
+      animalTypeId: 1,
+      isStreet: true,
+    });
+    assert.deepEqual(result, results);
+
+    search.mock.restore();
+  });
+
+  it('passes an empty filter when no query params are given', async () => {
+    const search = mock.method(animalsRepository, 'search', async () => []);
+
+    await animalsService.search({});
+
+    assert.deepEqual(search.mock.calls[0]!.arguments[0], {});
+
+    search.mock.restore();
+  });
+});
