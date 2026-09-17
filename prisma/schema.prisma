@@ -1,0 +1,163 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Animal {
+  id             String          @id @default(dbgenerated("substr(replace((gen_random_uuid())::text, '-'::text, ''::text), 1, 8)")) @db.VarChar(8)
+  name           String          @db.VarChar(100)
+  dob            DateTime?       @db.Date
+  animalTypeId   Int             @map("animal_type_id")
+  breed          String?         @db.VarChar(100)
+  isStreet       Boolean         @default(false) @map("is_street")
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdBy      String          @map("created_by") @db.Uuid
+  animalType     AnimalType      @relation(fields: [animalTypeId], references: [id])
+  creator        User            @relation(fields: [createdBy], references: [id])
+  owners         AnimalOwner[]
+  weights        AnimalWeight[]
+  medicalRecords MedicalRecord[]
+
+  @@index([createdBy], map: "idx_animal_created_by")
+  @@index([isStreet], map: "idx_animal_is_street")
+  @@index([name], map: "idx_animal_name")
+  @@index([animalTypeId], map: "idx_animal_type")
+  @@map("animal")
+}
+
+model AnimalOwner {
+  userId    String   @map("user_id") @db.Uuid
+  animalId  String   @map("animal_id") @db.VarChar(8)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  animal    Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, animalId])
+  @@index([animalId], map: "idx_animal_owner_animal")
+  @@map("animal_owner")
+}
+
+model AnimalType {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique @db.VarChar(100)
+  animals Animal[]
+
+  @@map("animal_type")
+}
+
+model AnimalWeight {
+  id       Int      @id @default(autoincrement())
+  animalId String   @map("animal_id") @db.VarChar(8)
+  weight   Decimal  @db.Decimal(6, 2)
+  dateTime DateTime @map("date_time") @db.Timestamptz(6)
+  animal   Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@index([animalId, dateTime], map: "idx_animal_weight_animal_date")
+  @@map("animal_weight")
+}
+
+model MedicalRecord {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  medicalRecordTypeId Int               @map("medical_record_type_id")
+  title               String            @db.VarChar(200)
+  description         String?
+  prescribedBy        String            @map("prescribed_by") @db.Uuid
+  animalId            String            @map("animal_id") @db.VarChar(8)
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdBy           String            @map("created_by") @db.Uuid
+  animal              Animal            @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  creator             User              @relation(fields: [createdBy], references: [id])
+  medicalRecordType   MedicalRecordType @relation(fields: [medicalRecordTypeId], references: [id])
+  prescriber          VetHospitalMember @relation(fields: [prescribedBy], references: [id])
+
+  @@index([animalId, createdAt(sort: Desc)], map: "idx_medical_record_animal_created")
+  @@index([createdBy], map: "idx_medical_record_created_by")
+  @@index([prescribedBy], map: "idx_medical_record_prescribed_by")
+  @@index([medicalRecordTypeId], map: "idx_medical_record_type")
+  @@map("medical_record")
+}
+
+model MedicalRecordType {
+  id             Int             @id @default(autoincrement())
+  name           String          @unique @db.VarChar(100)
+  medicalRecords MedicalRecord[]
+
+  @@map("medical_record_type")
+}
+
+model Role {
+  id      Int                 @id @default(autoincrement())
+  name    String              @unique @db.VarChar(50)
+  members VetHospitalMember[]
+
+  @@map("role")
+}
+
+model User {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String              @db.VarChar(150)
+  dob                    DateTime?           @db.Date
+  googleId               String?             @unique @map("google_id") @db.VarChar(255)
+  appleId                String?             @unique @map("apple_id") @db.VarChar(255)
+  phoneNo                String?             @map("phone_no") @db.VarChar(20)
+  address                String?             @db.VarChar(255)
+  email                  String              @unique @db.VarChar(255)
+  animals                Animal[]
+  animalOwners           AnimalOwner[]
+  medicalRecords         MedicalRecord[]
+  vetHospitals           VetHospital[]
+  vetHospitalMemberships VetHospitalMember[]
+
+  @@index([phoneNo], map: "idx_user_phone_no")
+  @@map("user")
+}
+
+model VetHospital {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String              @db.VarChar(150)
+  phoneNo           String?             @map("phone_no") @db.VarChar(20)
+  address           String?             @db.VarChar(255)
+  businessEmail     String?             @map("business_email") @db.VarChar(255)
+  vetHospitalTypeId Int                 @map("vet_hospital_type_id")
+  isVerified        Boolean             @default(false) @map("is_verified")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdBy         String              @map("created_by") @db.Uuid
+  creator           User                @relation(fields: [createdBy], references: [id])
+  vetHospitalType   VetHospitalType     @relation(fields: [vetHospitalTypeId], references: [id])
+  members           VetHospitalMember[]
+
+  @@index([createdBy], map: "idx_vet_hospital_created_by")
+  @@index([vetHospitalTypeId], map: "idx_vet_hospital_type")
+  @@index([isVerified], map: "idx_vet_hospital_verified")
+  @@map("vet_hospital")
+}
+
+model VetHospitalMember {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vetHospitalId  String          @map("vet_hospital_id") @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  roleId         Int             @map("role_id")
+  joinedAt       DateTime        @default(now()) @map("joined_at") @db.Timestamptz(6)
+  medicalRecords MedicalRecord[]
+  role           Role            @relation(fields: [roleId], references: [id])
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vetHospital    VetHospital     @relation(fields: [vetHospitalId], references: [id], onDelete: Cascade)
+
+  @@unique([vetHospitalId, userId])
+  @@index([roleId], map: "idx_vhm_role")
+  @@index([userId], map: "idx_vhm_user")
+  @@map("vet_hospital_member")
+}
+
+model VetHospitalType {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique @db.VarChar(100)
+  vetHospitals VetHospital[]
+
+  @@map("vet_hospital_type")
+}

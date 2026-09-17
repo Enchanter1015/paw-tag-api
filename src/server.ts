@@ -1,6 +1,10 @@
 import { createApp } from './app.js';
 import { config } from './config/index.js';
+import { connectWithRetry } from './db/connect.js';
+import { prisma } from './db/prisma.js';
 import { logger } from './lib/logger.js';
+
+await connectWithRetry();
 
 const app = createApp();
 const server = app.listen(config.server.port, config.server.host, () => {
@@ -24,12 +28,14 @@ const shutdown = (signal: string): void => {
 
   server.close((err) => {
     clearTimeout(forceExit);
-    if (err) {
-      logger.error({ err }, 'Error during shutdown');
-      process.exit(1);
-    }
-    logger.info('Shutdown complete');
-    process.exit(0);
+    void prisma.$disconnect().finally(() => {
+      if (err) {
+        logger.error({ err }, 'Error during shutdown');
+        process.exit(1);
+      }
+      logger.info('Shutdown complete');
+      process.exit(0);
+    });
   });
 };
 

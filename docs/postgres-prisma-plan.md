@@ -1,7 +1,7 @@
 # Plan: Postgres (Prisma) + TypeScript for paw-tag-api
 
-Status: in progress — Phase 1 complete, Phases 2-7 not yet implemented.
-Last updated: 2026-09-16
+Status: in progress — Phases 1-2 complete, Phases 3-7 not yet implemented.
+Last updated: 2026-09-17
 
 ## Locked decisions
 
@@ -62,7 +62,7 @@ Every table has `created_at timestamptz DEFAULT now()`. **None have `updated_at`
    `errorHandler` typed `ErrorRequestHandler`; `src/types/express.d.ts` declaration-merges
    `Request.id`, `Request.log` (pino-http) and `Request.actorId`.
 
-## Phase 2 — Prisma introspection + baseline (depends on 1)
+## Phase 2 — Prisma introspection + baseline (depends on 1) — ✅ Done (2026-09-17)
 
 1. Deps: `@prisma/client`; dev: `prisma`.
 2. `prisma db pull` against the live Layerbase DB to generate `prisma/schema.prisma`.
