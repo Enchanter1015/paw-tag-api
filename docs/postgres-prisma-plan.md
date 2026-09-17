@@ -117,20 +117,100 @@ Shape per module: `<name>.schema.ts` (zod), `.repository.ts` (prisma, accepts an
 client), `.service.ts` (rules, throws `AppError` subclasses), `.controller.ts` (`asyncHandler`),
 `.routes.ts`. Mount in `src/routes/index.ts`.
 
-1. **users** — `GET /users/:id`, `GET /users?email=`, `POST /users`, `PATCH /users/:id`.
-   Duplicate email / google_id / apple_id → 409 via P2002.
-2. **animals** (reference implementation, build first) — CRUD on `/animals`; list filters
-   `animal_type_id`, `is_street`, `name` (all backed by existing indexes).
-   Never accept a client-supplied id — the DB default generates the 8-char id.
-   Nested `/animals/:id/owners` (POST/DELETE against the composite PK) and
-   `/animals/:id/weights` (GET paginated `date_time DESC`, POST).
-3. **vet hospitals** — CRUD `/vet-hospitals`; `/vet-hospitals/:id/members`
-   (POST / PATCH role / DELETE), 409 on the `(vet_hospital_id, user_id)` unique.
-4. **medical records** — `/animals/:animalId/medical-records` (GET list uses
-   `idx_medical_record_animal_created`), POST/PATCH/DELETE `/medical-records/:id`.
-   `prescribed_by` must be a `vet_hospital_member` id — validate, 400/404 on mismatch.
-5. **lookups** (read-only) — `GET /animal-types`, `/medical-record-types`,
-   `/vet-hospital-types`, `/roles`.
+Each numbered item below is **one PR**, mapped to its Jira ticket (all currently "To Do").
+Sub-bullets are the suggested commit sequence within that PR. PRs are ordered so each only
+depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earlier PR in this list.
+
+1. **PR 1 — lookups module** *(no ticket; prerequisite seed data for every module below)*
+   - `chore(lookups): add schema+repository+service+controller+routes for animal_type,
+     medical_record_type, vet_hospital_type, role`
+   - `feat(lookups): mount GET /animal-types, /medical-record-types, /vet-hospital-types, /roles`
+   - `test(lookups): route + repository tests`
+
+2. **PR 2 — SCRUM-26 Register street dog API**
+   - `feat(animals): zod schema for create (sex, approx age, colour, location, description, photo)`
+   - `feat(animals): repository.create + service (never accept client-supplied id)`
+   - `feat(animals): POST /animals controller + route`
+   - `test(animals): required-field validation errors, successful create returns generated id`
+
+3. **PR 3 — SCRUM-28 View dog information API** *(depends on PR 2)*
+   - `feat(animals): repository.findById + service`
+   - `feat(animals): GET /animals/:id controller + route`
+   - `test(animals): 404 on unknown id, field-shape test per role placeholder`
+
+4. **PR 4 — SCRUM-27 Update dog information API** *(depends on PR 2)*
+   - `feat(animals): zod schema for partial update`
+   - `feat(animals): repository.update + service (touches updated_at)`
+   - `feat(animals): PATCH /animals/:id controller + route`
+   - `test(animals): update persists, updated_at changes, rejects non-permitted fields`
+
+5. **PR 5 — SCRUM-29 Search dogs API (by identifier and by location)** *(depends on PR 2)*
+   - `feat(animals): repository.search by id/name/description using idx_animal_name`
+   - `feat(animals): location/radius search (lat/lng + radius params)`
+   - `feat(animals): GET /animals?query=&lat=&lng=&radius= controller + route`
+   - `test(animals): text-match results, location results ordered by proximity`
+
+6. **PR 6 — SCRUM-30 Administrator dog record management API** *(depends on PR 2, 4)*
+   - `feat(animals): service.merge / service.remove with audit log (actor id + timestamp)`
+   - `feat(animals): DELETE /animals/:id and POST /animals/:id/merge controller + routes`
+   - `test(animals): merge/remove applies and is logged with actor identity`
+
+7. **PR 7 — users module** *(no single ticket; groundwork consumed by SCRUM-48/49 below)*
+   - `feat(users): zod schema, repository, service (409 on email/google_id/apple_id P2002)`
+   - `feat(users): GET /users/:id, GET /users?email=, POST /users, PATCH /users/:id`
+   - `test(users): duplicate-email 409, not-found 404, update flow`
+
+8. **PR 8 — vet hospitals + members module** *(prerequisite for medical records `prescribed_by`)*
+   - `feat(vet-hospitals): zod schema, repository, service; CRUD /vet-hospitals`
+   - `feat(vet-hospitals): /vet-hospitals/:id/members POST/PATCH role/DELETE,
+     409 on (vet_hospital_id, user_id) unique`
+   - `test(vet-hospitals): CRUD + member uniqueness conflict`
+
+9. **PR 9 — SCRUM-36 Vaccination record API (add, update, view)** *(depends on PR 8; medical_record_type = vaccination)*
+   - `feat(medical-records): zod schema scoped to vaccination type (vaccine, date, next due, provider, notes)`
+   - `feat(medical-records): repository/service — prescribed_by validated against vet_hospital_member`
+   - `feat(medical-records): POST /animals/:animalId/medical-records, GET list via
+     idx_medical_record_animal_created`
+   - `feat(medical-records): PATCH /medical-records/:id verification flag`
+   - `test(medical-records): create+link to animal, chronological list with next-due-date,
+     verify toggles status`
+
+10. **PR 10 — SCRUM-38 Sterilisation record API (add, update, view)** *(depends on PR 9)*
+    - `feat(medical-records): sterilisation-type schema (date, location, verification)`
+    - `feat(animals): derive/expose sterilisation status from latest sterilisation record`
+    - `feat(medical-records): reuse add/update/view routes for sterilisation type`
+    - `test(medical-records): status flips to sterilised, history + current status both retrievable`
+
+11. **PR 11 — SCRUM-40 Medical treatment record API (add, update, view)** *(depends on PR 9)*
+    - `feat(medical-records): treatment-type schema (condition/injury, treatment, medication, notes)`
+    - `feat(medical-records): reuse add/update/view routes for treatment type`
+    - `test(medical-records): stored with timestamp/provider/verification, chronological retrieval`
+
+12. **PR 12 — SCRUM-41 Dog health summary aggregation API** *(depends on PR 9, 10, 11)*
+    - `feat(animals): service.getHealthSummary aggregating latest vaccination/sterilisation/treatment`
+    - `feat(animals): GET /animals/:id/health-summary controller + route`
+    - `test(animals): summary reflects current status + most recent event date per category`
+
+13. **PR 13 — SCRUM-48 Medical record verification API** *(depends on PR 9)*
+    - `feat(medical-records): service.verify(id, verifierMemberId) — stores identity + timestamp`
+    - `feat(medical-records): reject-without-delete flag (audit trail preserved)`
+    - `feat(medical-records): PATCH /medical-records/:id/verify, /reject controller + routes`
+    - `test(medical-records): verify sets verifier+timestamp, reject flags rather than deletes`
+
+14. **PR 14 — SCRUM-49 User management API (administrator)** *(depends on PR 7)*
+    - `feat(users): service.updateRole, service.deactivate`
+    - `feat(users): GET /users (list), PATCH /users/:id/role, PATCH /users/:id/deactivate`
+    - `test(users): role change takes effect, deactivated user denied on next auth check`
+
+**Deferred / out of scope for this phase** (ticket exists but has no matching table or is explicitly
+out of scope per "Locked decisions" above — revisit in a separate plan):
+- SCRUM-19/20/21/22 (auth, sessions, RBAC, input-sanitisation middleware) — no auth layer yet;
+  `x-user-id` actor header is the temporary stand-in (see Phase 3 notes).
+- SCRUM-44/45 (QR generation/resolution) — no tag/QR table in the schema.
+- SCRUM-52 (dashboard/KPI stats) — candidate for a later "reporting" module once Phase 5 data exists.
+- SCRUM-54 (GPS location support) — check whether `animal` already has lat/lng columns before
+  scoping a PR; if not, needs its own migration first.
+- SCRUM-58/59 (offline sync, automated backups) — infrastructure/ops work, not a REST module.
 
 ## Phase 6 — Integration tests (depends on 5)
 

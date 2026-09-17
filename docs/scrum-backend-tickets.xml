@@ -1,0 +1,601 @@
+<?xml version="1.0" ?>
+<backlog project="SCRUM" filter="labels = backend" exportedAt="2026-09-17" count="23">
+  <issue key="SCRUM-16" id="10015">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-16</url>
+    <summary>[Backend] System architecture and REST API foundation</summary>
+    <issueType>Story</issueType>
+    <status>Done</status>
+    <statusCategory>Done</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-5">Foundation &amp; Architecture</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:28.071+0530</created>
+    <updated>2026-09-16T20:59:35.283+0530</updated>
+    <description>As a development team, I want a documented system architecture and a REST API skeleton (routing, layered structure, environment configuration, error-handling conventions) so that all subsequent backend features can be built consistently and securely.
+Acceptance Criteria:
+* Given the repository is initialised, when the API server starts, then it exposes a health-check endpoint and loads configuration from environment variables.
+* Given the architecture document, when reviewed by the Product Owner, then all required components (auth, dog records, health records, QR, reporting) are shown to be covered.
+* Given a new endpoint is added, when a developer follows the project's conventions, then request validation, error responses and logging are consistent with the rest of the API.
+</description>
+  </issue>
+  <issue key="SCRUM-17" id="10016">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-17</url>
+    <summary>[Backend] Database schema design and setup</summary>
+    <issueType>Story</issueType>
+    <status>PO Acceptance</status>
+    <statusCategory>In Progress</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-5">Foundation &amp; Architecture</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:31.916+0530</created>
+    <updated>2026-09-17T12:33:38.765+0530</updated>
+    <description>As a backend developer, I want a relational database schema covering users, dogs, vaccinations, sterilisations, treatments and QR codes so that all required business data can be stored, related, and queried correctly.
+Acceptance Criteria:
+* Given the schema, when reviewed against the required field lists for dogs, vaccinations, sterilisations and treatments, then every required field is represented.
+* Given a dog record, when a vaccination, sterilisation or treatment is added, then it is correctly linked to that dog's unique Dog ID via a foreign key.
+* Given the schema, when migrations are run against a fresh database, then they complete without error and are repeatable.
+</description>
+  </issue>
+  <issue key="SCRUM-19" id="10018">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-19</url>
+    <summary>[Backend] User registration  login API</summary>
+    <issueType>Story</issueType>
+    <status>In Progress</status>
+    <statusCategory>In Progress</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:38.731+0530</created>
+    <updated>2026-09-17T12:34:05.023+0530</updated>
+    <description>As a registered user (animal welfare worker, veterinarian, or administrator), I want to register an account and log in securely so that I can access the features permitted to my role.
+Acceptance Criteria:
+* Given valid registration details, when I submit the registration request, then an account is created with a securely hashed password and I cannot register twice with the same email.
+* Given correct credentials, when I log in, then I receive a valid session/token scoped to my role.
+* Given incorrect credentials, when I attempt to log in, then the API rejects the request without revealing whether the email or password was wrong.
+</description>
+  </issue>
+  <issue key="SCRUM-20" id="10019">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-20</url>
+    <summary>[Backend] Logout and session/token invalidation API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>2</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:42.423+0530</created>
+    <updated>2026-09-15T17:37:40.643+0530</updated>
+    <description>As a logged-in user, I want to log out so that my session cannot be reused from my device after I leave it.
+Acceptance Criteria:
+* Given an active session, when I log out, then the session/token is invalidated server-side and further requests using it are rejected.
+</description>
+  </issue>
+  <issue key="SCRUM-21" id="10020">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-21</url>
+    <summary>[Backend] Role-based access control middleware (Guest, Registered User, Administrator)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:45.709+0530</created>
+    <updated>2026-09-15T17:39:15.260+0530</updated>
+    <description>As the system, I want to enforce role-based permissions on every endpoint so that each user can only perform actions permitted to their role.
+Acceptance Criteria:
+* Given an unauthenticated request, when a Guest accesses a public endpoint (e.g. view dog profile by QR), then the response includes only publicly permitted fields.
+* Given a Registered User token, when they call an administrator-only endpoint, then the API returns 403 Forbidden.
+* Given the permission matrix, when each role calls each endpoint, then the observed behaviour matches the matrix exactly.
+</description>
+  </issue>
+  <issue key="SCRUM-22" id="10021">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-22</url>
+    <summary>[Backend] Secure input validation &amp; sanitisation across API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:48.903+0530</created>
+    <updated>2026-09-15T17:39:25.010+0530</updated>
+    <description>As the system, I want every API endpoint to validate and sanitise its input so that malformed, malicious or oversized data cannot corrupt records or compromise the system.
+Acceptance Criteria:
+* Given an endpoint that accepts user input, when invalid or malicious input (e.g. script tags, oversized payloads) is submitted, then the request is rejected with a clear validation error and nothing is persisted.
+* Given valid input, when submitted, then it is accepted and persisted correctly.
+</description>
+  </issue>
+  <issue key="SCRUM-26" id="10025">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-26</url>
+    <summary>[Backend] Register street dog API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:07.858+0530</created>
+    <updated>2026-09-15T17:41:28.524+0530</updated>
+    <description>As an animal welfare worker, I want an API to register a new street dog with its Dog ID, sex, approximate age, colour, location, description and photograph so that the dog has a digital profile others can find and update.
+Acceptance Criteria:
+* Given required fields are provided, when I submit a registration request, then a new dog profile is created with a unique Dog ID.
+* Given a required field (e.g. Dog ID reference) is missing, when I submit, then the request is rejected with a specific field error.
+</description>
+  </issue>
+  <issue key="SCRUM-27" id="10026">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-27</url>
+    <summary>[Backend] Update dog information API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:11.653+0530</created>
+    <updated>2026-09-15T17:41:38.712+0530</updated>
+    <description>As an animal welfare worker or administrator, I want to update a dog's profile information so that records stay accurate over time.
+Acceptance Criteria:
+* Given an existing dog profile, when I submit an update to permitted fields, then the change is saved and the profile's last-updated timestamp changes.
+* Given a field I am not permitted to change for my role, when I attempt to update it, then the request is rejected.
+</description>
+  </issue>
+  <issue key="SCRUM-28" id="10027">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-28</url>
+    <summary>[Backend] View dog information API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:15.516+0530</created>
+    <updated>2026-09-15T17:41:49.889+0530</updated>
+    <description>As any user, I want to retrieve a dog's profile information appropriate to my role so that I can see its status and history.
+Acceptance Criteria:
+* Given a valid Dog ID, when I request the profile as a Guest, then I receive the publicly permitted fields only.
+* Given a valid Dog ID, when I request the profile as a Veterinarian, then I receive the full medical and profile record.
+</description>
+  </issue>
+  <issue key="SCRUM-29" id="10028">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-29</url>
+    <summary>[Backend] Search dogs API (by identifier and by location)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:18.923+0530</created>
+    <updated>2026-09-15T17:42:02.989+0530</updated>
+    <description>As a user, I want to search for dogs by ID/description and by location so that I can quickly find a specific dog or dogs in an area.
+Acceptance Criteria:
+* Given a search term matching a dog's ID or description, when I search, then matching dog profiles are returned.
+* Given a location or radius, when I search by location, then dogs registered near that location are returned, ordered by proximity.
+</description>
+  </issue>
+  <issue key="SCRUM-30" id="10029">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-30</url>
+    <summary>[Backend] Administrator dog record management API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 1</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:22.331+0530</created>
+    <updated>2026-09-15T17:42:19.902+0530</updated>
+    <description>As an administrator, I want to edit, merge or remove dog records so that the dataset stays clean and accurate.
+Acceptance Criteria:
+* Given a duplicate or invalid dog record, when an administrator removes or merges it, then the change is applied and logged with the administrator's identity and timestamp.
+</description>
+  </issue>
+  <issue key="SCRUM-36" id="10035">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-36</url>
+    <summary>[Backend] Vaccination record API (add, update, view)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-8">Vaccination Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:47.290+0530</created>
+    <updated>2026-09-15T16:27:14.819+0530</updated>
+    <description>As a veterinarian or authorised animal welfare worker, I want to add, update and retrieve a dog's vaccination records (vaccine type, date, next due date, provider, notes, verification) so that its vaccination history is accurately tracked.
+Acceptance Criteria:
+* Given valid vaccination details, when I submit a new record, then it is saved and linked to the correct dog.
+* Given an existing vaccination record, when I request the dog's vaccination history, then all records are returned in chronological order with the next-due-date visible.
+* Given a vaccination record submitted by a non-veterinarian, when a veterinarian reviews it, then it can be marked verified.
+</description>
+  </issue>
+  <issue key="SCRUM-38" id="10037">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-38</url>
+    <summary>[Backend] Sterilisation record API (add, update, view)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-9">Sterilisation Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:54.243+0530</created>
+    <updated>2026-09-15T16:27:21.608+0530</updated>
+    <description>As a veterinarian, I want to record and update a dog's sterilisation status (date, location, verification) so that duplicate procedures are avoided and status is verifiable.
+Acceptance Criteria:
+* Given a dog has no sterilisation record, when I record one, then the dog's sterilisation status changes to &quot;sterilised&quot; with the supporting details stored.
+* Given a sterilisation record exists, when I request the dog's sterilisation information, then the current status and history are both available.
+</description>
+  </issue>
+  <issue key="SCRUM-40" id="10039">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-40</url>
+    <summary>[Backend] Medical treatment record API (add, update, view)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-10">Medical Treatment Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:02.049+0530</created>
+    <updated>2026-09-15T16:27:28.353+0530</updated>
+    <description>As a veterinarian, animal welfare worker or authorised community member, I want to record and retrieve medical treatments (condition/injury, treatment type, medication, notes, provider, verification) so that a dog's treatment history is complete and trustworthy.
+Acceptance Criteria:
+* Given a treatment is administered, when I submit a treatment record, then it is stored with a timestamp, provider identity and verification status.
+* Given a dog's treatment history is requested, when returned, then entries are ordered chronologically and show verification status per entry.
+</description>
+  </issue>
+  <issue key="SCRUM-41" id="10040">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-41</url>
+    <summary>[Backend] Dog health summary aggregation API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-10">Medical Treatment Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:05.452+0530</created>
+    <updated>2026-09-15T16:27:31.198+0530</updated>
+    <description>As any authorised user, I want a single endpoint that summarises a dog's vaccination, sterilisation and treatment status so that I can assess its overall health without reading every individual record.
+Acceptance Criteria:
+* Given a dog with vaccination, sterilisation and treatment records, when I request its health summary, then the response shows current status for each category plus the most recent event date.
+</description>
+  </issue>
+  <issue key="SCRUM-44" id="10043">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-44</url>
+    <summary>[Backend] QR code generation API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-11">QR Code Identification</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:20.432+0530</created>
+    <updated>2026-09-15T16:27:43.697+0530</updated>
+    <description>As the system, I want to generate a unique, scannable QR code linked to each dog's Dog ID so that anyone scanning it is taken directly to that dog's profile.
+Acceptance Criteria:
+* Given a newly registered dog, when its QR code is generated, then it encodes a URL that uniquely resolves to that dog's profile and no other dog's.
+* Given a QR code already exists for a dog, when generation is requested again, then the existing code is returned rather than creating a duplicate identity.
+</description>
+  </issue>
+  <issue key="SCRUM-45" id="10044">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-45</url>
+    <summary>[Backend] QR code scan resolution API, including invalid codes</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>backend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-11">QR Code Identification</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:24.588+0530</created>
+    <updated>2026-09-15T16:27:46.619+0530</updated>
+    <description>As the system, I want to resolve a scanned QR code to the correct dog profile, and return a clear error for unrecognised codes, so that scanning is reliable and failures are understandable.
+Acceptance Criteria:
+* Given a valid QR code is scanned, when resolved, then the correct dog's profile data is returned within an acceptable response time.
+* Given an invalid or unrecognised code is scanned, when resolved, then a specific &quot;not found&quot; error is returned rather than a generic failure.
+</description>
+  </issue>
+  <issue key="SCRUM-48" id="10047">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-48</url>
+    <summary>[Backend] Medical record verification API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-12">Record Verification &amp; User Administration</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:35.593+0530</created>
+    <updated>2026-09-15T16:27:55.218+0530</updated>
+    <description>As a veterinarian, I want to verify vaccination, sterilisation and treatment records submitted by others so that the platform maintains trust in crowd-sourced medical data.
+Acceptance Criteria:
+* Given an unverified record, when a veterinarian marks it verified, then the record's status changes and the verifying veterinarian's identity and timestamp are stored.
+* Given a record fails verification, when rejected, then it is flagged rather than silently deleted, preserving the audit trail.
+</description>
+  </issue>
+  <issue key="SCRUM-49" id="10048">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-49</url>
+    <summary>[Backend] User management API (administrator)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-12">Record Verification &amp; User Administration</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:39.293+0530</created>
+    <updated>2026-09-15T16:27:58.199+0530</updated>
+    <description>As an administrator, I want to view, edit roles for, and deactivate user accounts so that access stays correctly scoped as the team changes.
+Acceptance Criteria:
+* Given a list of registered users, when an administrator changes a user's role, then the change takes effect on that user's next request.
+* Given a user account is deactivated, when that user attempts to log in, then access is denied.
+</description>
+  </issue>
+  <issue key="SCRUM-52" id="10051">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-52</url>
+    <summary>[Backend] Dashboard statistics &amp; KPI calculation API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-5</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-13">Reporting Dashboard</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:54.505+0530</created>
+    <updated>2026-09-15T16:28:11.120+0530</updated>
+    <description>As an administrator or stakeholder, I want an API that returns total dogs tracked, vaccination coverage and sterilisation coverage so that overall programme impact can be reported accurately.
+Acceptance Criteria:
+* Given the current dataset, when the statistics endpoint is called, then vaccination and sterilisation coverage percentages match a manual calculation from the underlying records.
+* Given new records are added, when statistics are requested again, then the figures reflect the latest data.
+</description>
+  </issue>
+  <issue key="SCRUM-54" id="10053">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-54</url>
+    <summary>[Backend] GPS location support in dog records</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P3</label>
+      <label>backend</label>
+      <label>sprint-5</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-14">Mobile, Offline &amp; Theming</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:02.022+0530</created>
+    <updated>2026-09-15T16:28:17.399+0530</updated>
+    <description>As the system, I want to accept and store a GPS coordinate with a dog's registration or sighting so that location-based search and reporting are possible.
+Acceptance Criteria:
+* Given a registration request includes GPS coordinates, when saved, then they are stored and retrievable with the dog's profile.
+</description>
+  </issue>
+  <issue key="SCRUM-58" id="10057">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-58</url>
+    <summary>[Backend] Offline change synchronisation &amp; conflict resolution API</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-6</label>
+    </labels>
+    <storyPoints>13</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-15">Data Synchronisation &amp; Backup</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:16.024+0530</created>
+    <updated>2026-09-15T16:28:31.087+0530</updated>
+    <description>As the system, I want to accept a batch of changes made offline and reconcile them with the server's current data, flagging conflicts, so that no field data is lost when connectivity returns.
+Acceptance Criteria:
+* Given a set of offline changes with no conflicts, when synced, then all changes are applied and the client is notified of success per item.
+* Given an offline change conflicts with a newer server-side change to the same record, when synced, then the conflict is flagged for review rather than silently overwritten.
+</description>
+  </issue>
+  <issue key="SCRUM-59" id="10058">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-59</url>
+    <summary>[Backend] Automated database backup and recovery process</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>backend</label>
+      <label>sprint-6</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-15">Data Synchronisation &amp; Backup</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:19.368+0530</created>
+    <updated>2026-09-15T16:28:34.377+0530</updated>
+    <description>As the development team, I want automated, regularly scheduled database backups with a documented recovery process so that the platform can recover from data loss.
+Acceptance Criteria:
+* Given the backup schedule, when a backup job runs, then a complete, restorable backup is produced and its success/failure is logged.
+* Given a restore is needed, when the documented recovery process is followed against a backup, then the database is restored to a consistent state.
+</description>
+  </issue>
+</backlog>
