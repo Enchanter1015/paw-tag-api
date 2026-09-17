@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { animalsService } from './animals.service.js';
-import type { CreateAnimalInput, SearchAnimalsQuery, UpdateAnimalInput } from './animals.schema.js';
+import type { CreateAnimalInput, MergeAnimalInput, SearchAnimalsQuery, UpdateAnimalInput } from './animals.schema.js';
 import { asyncHandler } from '../../lib/async-handler.js';
 
 export const registerAnimal = asyncHandler(async (req: Request, res: Response) => {
@@ -26,4 +26,15 @@ export const searchAnimals = asyncHandler(async (req: Request, res: Response) =>
   const query = req.query as unknown as SearchAnimalsQuery;
   const animals = await animalsService.search(query);
   res.status(StatusCodes.OK).json(animals);
+});
+
+export const removeAnimal = asyncHandler(async (req: Request, res: Response) => {
+  await animalsService.remove(req.params.id!, req.actorId!);
+  res.status(StatusCodes.NO_CONTENT).send();
+});
+
+export const mergeAnimal = asyncHandler(async (req: Request, res: Response) => {
+  const { targetId } = req.body as MergeAnimalInput;
+  const animal = await animalsService.merge(req.params.id!, targetId, req.actorId!);
+  res.status(StatusCodes.OK).json(animal);
 });

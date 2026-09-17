@@ -32,3 +32,9 @@ export const searchAnimalsQuerySchema = z.object({
 });
 
 export type SearchAnimalsQuery = z.infer<typeof searchAnimalsQuerySchema>;
+
+export const mergeAnimalBodySchema = z.object({
+  targetId: z.string().trim().length(8),
+});
+
+export type MergeAnimalInput = z.infer<typeof mergeAnimalBodySchema>;

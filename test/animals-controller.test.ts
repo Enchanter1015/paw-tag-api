@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 
 process.env.NODE_ENV = 'test';
 
-const { getAnimal, registerAnimal, searchAnimals, updateAnimal } = await import('../src/modules/animals/animals.controller.js');
+const { getAnimal, mergeAnimal, registerAnimal, removeAnimal, searchAnimals, updateAnimal } = await import('../src/modules/animals/animals.controller.js');
 const { animalsService } = await import('../src/modules/animals/animals.service.js');
 
 const createRes = () => {
@@ -102,5 +102,52 @@ describe('searchAnimals', () => {
     assert.deepEqual(statusResult.json.mock.calls[0]!.arguments[0], results);
 
     search.mock.restore();
+  });
+});
+
+describe('removeAnimal', () => {
+  it('responds 204 after removing the animal', async () => {
+    const remove = mock.method(animalsService, 'remove', async () => ({ id: 'abcd1234' }));
+    const send = mock.fn();
+    const status = mock.fn(() => ({ send }));
+
+    const req = { params: { id: 'abcd1234' }, actorId: 'user-1' } as unknown as Request;
+    const res = { status } as unknown as Response;
+
+    await removeAnimal(req, res, () => {});
+
+    assert.equal(remove.mock.calls[0]!.arguments[0], 'abcd1234');
+    assert.equal(remove.mock.calls[0]!.arguments[1], 'user-1');
+    assert.equal((status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.NO_CONTENT);
+
+    remove.mock.restore();
+  });
+});
+
+describe('mergeAnimal', () => {
+  it('responds 200 with the merge result', async () => {
+    const merged = { id: 'abcd1234' };
+    const merge = mock.method(animalsService, 'merge', async () => merged);
+
+    const req = {
+      params: { id: 'abcd1234' },
+      body: { targetId: 'wxyz5678' },
+      actorId: 'user-1',
+    } as unknown as Request;
+    const res = createRes();
+
+    await mergeAnimal(req, res, () => {});
+
+    assert.equal(merge.mock.calls[0]!.arguments[0], 'abcd1234');
+    assert.equal(merge.mock.calls[0]!.arguments[1], 'wxyz5678');
+    assert.equal(merge.mock.calls[0]!.arguments[2], 'user-1');
+    assert.equal((res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.OK);
+
+    const statusResult = (res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.result as {
+      json: ReturnType<typeof mock.fn>;
+    };
+    assert.deepEqual(statusResult.json.mock.calls[0]!.arguments[0], merged);
+
+    merge.mock.restore();
   });
 });

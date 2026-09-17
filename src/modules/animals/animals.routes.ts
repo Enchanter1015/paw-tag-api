@@ -1,9 +1,10 @@
 import { Router } from 'express';
 
-import { getAnimal, registerAnimal, searchAnimals, updateAnimal } from './animals.controller.js';
+import { getAnimal, mergeAnimal, registerAnimal, removeAnimal, searchAnimals, updateAnimal } from './animals.controller.js';
 import {
   animalIdParamsSchema,
   createAnimalSchema,
+  mergeAnimalBodySchema,
   searchAnimalsQuerySchema,
   updateAnimalSchema,
 } from './animals.schema.js';
@@ -20,4 +21,11 @@ animalsRouter.patch(
   requireActor,
   validate({ params: animalIdParamsSchema, body: updateAnimalSchema }),
   updateAnimal,
+);
+animalsRouter.delete('/animals/:id', requireActor, validate({ params: animalIdParamsSchema }), removeAnimal);
+animalsRouter.post(
+  '/animals/:id/merge',
+  requireActor,
+  validate({ params: animalIdParamsSchema, body: mergeAnimalBodySchema }),
+  mergeAnimal,
 );
