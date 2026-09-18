@@ -168,8 +168,8 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
      409 on (vet_hospital_id, user_id) unique`
    - `test(vet-hospitals): CRUD + member uniqueness conflict`
 
-9. **PR 9 — SCRUM-36 Vaccination record API (add, update, view)** *(depends on PR 8; medical_record_type = vaccination)*
-   - `feat(medical-records): zod schema scoped to vaccination type (vaccine, date, next due, provider, notes)`
+9. **PR 9 — SCRUM-36 Medical record API (add, update, view)** *(depends on PR 8; medical_record_type = vaccination)* - Done
+   - `feat(medical-records): zod schema scoped to Medical record type (medicalRecordTypeId, date, next due, provider, notes)`
    - `feat(medical-records): repository/service — prescribed_by validated against vet_hospital_member`
    - `feat(medical-records): POST /animals/:animalId/medical-records, GET list via
      idx_medical_record_animal_created`
@@ -177,23 +177,23 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `test(medical-records): create+link to animal, chronological list with next-due-date,
      verify toggles status`
 
-10. **PR 10 — SCRUM-38 Sterilisation record API (add, update, view)** *(depends on PR 9)*
+10. **PR 10 — SCRUM-38 Sterilisation record API (add, update, view)** *(depends on PR 9)* - Won't Do
     - `feat(medical-records): sterilisation-type schema (date, location, verification)`
     - `feat(animals): derive/expose sterilisation status from latest sterilisation record`
     - `feat(medical-records): reuse add/update/view routes for sterilisation type`
     - `test(medical-records): status flips to sterilised, history + current status both retrievable`
 
-11. **PR 11 — SCRUM-40 Medical treatment record API (add, update, view)** *(depends on PR 9)*
+11. **PR 11 — SCRUM-40 Medical treatment record API (add, update, view)** *(depends on PR 9)* - Won't Do
     - `feat(medical-records): treatment-type schema (condition/injury, treatment, medication, notes)`
     - `feat(medical-records): reuse add/update/view routes for treatment type`
     - `test(medical-records): stored with timestamp/provider/verification, chronological retrieval`
 
-12. **PR 12 — SCRUM-41 animal health summary aggregation API** *(depends on PR 9, 10, 11)*
+12. **PR 12 — SCRUM-41 animal health summary aggregation API** *(depends on PR 9, 10, 11)* - Won't Do
     - `feat(animals): service.getHealthSummary aggregating latest vaccination/sterilisation/treatment`
     - `feat(animals): GET /animals/:id/health-summary controller + route`
     - `test(animals): summary reflects current status + most recent event date per category`
 
-13. **PR 13 — SCRUM-48 Medical record verification API** *(depends on PR 9)*
+13. **PR 13 — SCRUM-48 Medical record verification API** *(depends on PR 9)* - Won't Do
     - `feat(medical-records): service.verify(id, verifierMemberId) — stores identity + timestamp`
     - `feat(medical-records): reject-without-delete flag (audit trail preserved)`
     - `feat(medical-records): PATCH /medical-records/:id/verify, /reject controller + routes`
