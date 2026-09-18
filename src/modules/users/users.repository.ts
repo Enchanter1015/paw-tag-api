@@ -1,0 +1,15 @@
+import type { Prisma } from '@prisma/client';
+
+import { prisma } from '../../db/prisma.js';
+
+type PrismaClientOrTx = typeof prisma | Prisma.TransactionClient;
+
+export const usersRepository = {
+  create: (data: Prisma.UserUncheckedCreateInput, client: PrismaClientOrTx = prisma) =>
+    client.user.create({ data }),
+  findById: (id: string, client: PrismaClientOrTx = prisma) => client.user.findUnique({ where: { id } }),
+  findByEmail: (email: string, client: PrismaClientOrTx = prisma) =>
+    client.user.findUnique({ where: { email } }),
+  update: (id: string, data: Prisma.UserUncheckedUpdateInput, client: PrismaClientOrTx = prisma) =>
+    client.user.update({ where: { id }, data }),
+};
