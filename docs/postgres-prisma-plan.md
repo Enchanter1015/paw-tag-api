@@ -162,7 +162,7 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `feat(users): GET /users/:id, GET /users?email=, POST /users, PATCH /users/:id`
    - `test(users): duplicate-email 409, not-found 404, update flow`
 
-8. **PR 8 — vet hospitals + members module** *(prerequisite for medical records `prescribed_by`)*
+8. **PR 8 — vet hospitals + members module** *(prerequisite for medical records `prescribed_by`)* - Done
    - `feat(vet-hospitals): zod schema, repository, service; CRUD /vet-hospitals`
    - `feat(vet-hospitals): /vet-hospitals/:id/members POST/PATCH role/DELETE,
      409 on (vet_hospital_id, user_id) unique`
