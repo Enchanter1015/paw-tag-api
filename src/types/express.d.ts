@@ -6,6 +6,8 @@ declare global {
       id: string;
       log: Logger;
       actorId?: string;
+      actorRole?: string;
+      actorPermissions?: string[];
     }
   }
 }

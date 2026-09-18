@@ -8,7 +8,8 @@ import {
   searchAnimalsQuerySchema,
   updateAnimalSchema,
 } from './animals.schema.js';
-import { requireActor } from '../../middleware/actor.js';
+import { authenticate } from '../../middleware/authenticate.js';
+import { requirePermission } from '../../middleware/require-permission.js';
 import { validate } from '../../middleware/validate.js';
 
 export const animalsRouter = Router();
@@ -19,7 +20,7 @@ export const animalsRouter = Router();
  *   post:
  *     summary: Register a street animal
  *     tags: [Animals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -34,7 +35,7 @@ export const animalsRouter = Router();
  *       400: { description: Validation error, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
  *       401: { description: Missing/invalid actor, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
  */
-animalsRouter.post('/animals', requireActor, validate({ body: createAnimalSchema }), registerAnimal);
+animalsRouter.post('/animals', authenticate, requirePermission('animals:write'), validate({ body: createAnimalSchema }), registerAnimal);
 
 /**
  * @openapi
@@ -88,7 +89,7 @@ animalsRouter.get('/animals/:id', validate({ params: animalIdParamsSchema }), ge
  *   patch:
  *     summary: Update animal information
  *     tags: [Animals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,7 +111,8 @@ animalsRouter.get('/animals/:id', validate({ params: animalIdParamsSchema }), ge
  */
 animalsRouter.patch(
   '/animals/:id',
-  requireActor,
+  authenticate,
+  requirePermission('animals:write'),
   validate({ params: animalIdParamsSchema, body: updateAnimalSchema }),
   updateAnimal,
 );
@@ -121,7 +123,7 @@ animalsRouter.patch(
  *   delete:
  *     summary: Remove an animal record (administrator)
  *     tags: [Animals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -131,7 +133,13 @@ animalsRouter.patch(
  *       204: { description: Removed }
  *       404: { description: Not found, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
  */
-animalsRouter.delete('/animals/:id', requireActor, validate({ params: animalIdParamsSchema }), removeAnimal);
+animalsRouter.delete(
+  '/animals/:id',
+  authenticate,
+  requirePermission('animals:manage'),
+  validate({ params: animalIdParamsSchema }),
+  removeAnimal,
+);
 
 /**
  * @openapi
@@ -139,7 +147,7 @@ animalsRouter.delete('/animals/:id', requireActor, validate({ params: animalIdPa
  *   post:
  *     summary: Merge a duplicate animal record into a target record (administrator)
  *     tags: [Animals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -162,7 +170,8 @@ animalsRouter.delete('/animals/:id', requireActor, validate({ params: animalIdPa
  */
 animalsRouter.post(
   '/animals/:id/merge',
-  requireActor,
+  authenticate,
+  requirePermission('animals:manage'),
   validate({ params: animalIdParamsSchema, body: mergeAnimalBodySchema }),
   mergeAnimal,
 );

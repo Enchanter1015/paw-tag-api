@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { animalsRouter } from '../modules/animals/animals.routes.js';
+import { authRouter } from '../modules/auth/auth.routes.js';
 import { healthRouter } from '../modules/health/health.routes.js';
 import { lookupsRouter } from '../modules/lookups/lookups.routes.js';
 import { medicalRecordsRouter } from '../modules/medical-records/medical-records.routes.js';
@@ -10,6 +11,7 @@ import { vetHospitalsRouter } from '../modules/vet-hospitals/vet-hospitals.route
 export const apiRouter = Router();
 
 apiRouter.use('/health', healthRouter);
+apiRouter.use(authRouter);
 apiRouter.use(lookupsRouter);
 apiRouter.use(animalsRouter);
 apiRouter.use(usersRouter);

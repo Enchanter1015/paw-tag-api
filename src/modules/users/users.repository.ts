@@ -5,6 +5,7 @@ import { prisma } from '../../db/prisma.js';
 type PrismaClientOrTx = typeof prisma | Prisma.TransactionClient;
 
 export const usersRepository = {
+  findDefaultRole: (client: PrismaClientOrTx = prisma) => client.role.findFirst({ where: { name: 'User' } }),
   create: (data: Prisma.UserUncheckedCreateInput, client: PrismaClientOrTx = prisma) =>
     client.user.create({ data }),
   findById: (id: string, client: PrismaClientOrTx = prisma) => client.user.findUnique({ where: { id } }),

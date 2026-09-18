@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { findUserByEmail, getUser, registerUser, updateUser } from './users.controller.js';
 import { createUserSchema, findUserQuerySchema, updateUserSchema, userIdParamsSchema } from './users.schema.js';
-import { requireActor } from '../../middleware/actor.js';
+import { authenticate } from '../../middleware/authenticate.js';
 import { validate } from '../../middleware/validate.js';
 
 export const usersRouter = Router();
@@ -78,7 +78,7 @@ usersRouter.get('/users/:id', validate({ params: userIdParamsSchema }), getUser)
  *   patch:
  *     summary: Update a user
  *     tags: [Users]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -101,7 +101,7 @@ usersRouter.get('/users/:id', validate({ params: userIdParamsSchema }), getUser)
  */
 usersRouter.patch(
   '/users/:id',
-  requireActor,
+  authenticate,
   validate({ params: userIdParamsSchema, body: updateUserSchema }),
   updateUser,
 );

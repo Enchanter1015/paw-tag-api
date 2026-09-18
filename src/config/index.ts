@@ -13,6 +13,11 @@ const envSchema = z.object({
   DATABASE_URL: z.string().startsWith('postgres'),
   DB_CONNECT_RETRIES: z.coerce.number().int().positive().default(5),
   DB_CONNECT_BACKOFF_MS: z.coerce.number().int().positive().default(500),
+  JWT_ACCESS_SECRET: z.string().min(32),
+  JWT_REFRESH_SECRET: z.string().min(32),
+  JWT_ACCESS_TTL: z.string().default('15m'),
+  JWT_REFRESH_TTL: z.string().default('30d'),
+  BCRYPT_COST: z.coerce.number().int().min(10).max(15).default(12),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -47,5 +52,12 @@ export const config = Object.freeze({
     url: env.DATABASE_URL,
     connectRetries: env.DB_CONNECT_RETRIES,
     connectBackoffMs: env.DB_CONNECT_BACKOFF_MS,
+  },
+  auth: {
+    accessSecret: env.JWT_ACCESS_SECRET,
+    refreshSecret: env.JWT_REFRESH_SECRET,
+    accessTtl: env.JWT_ACCESS_TTL,
+    refreshTtl: env.JWT_REFRESH_TTL,
+    bcryptCost: env.BCRYPT_COST,
   },
 } as const);

@@ -11,11 +11,11 @@ const options: swaggerJsdoc.Options = {
     servers: [{ url: '/api/v1' }],
     components: {
       securitySchemes: {
-        ActorId: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'x-user-id',
-          description: 'Temporary actor stand-in until real auth ships; must be an existing user id.',
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Access token issued by POST /auth/login, /auth/register or /auth/refresh.',
         },
       },
       schemas: {
@@ -234,6 +234,47 @@ const options: swaggerJsdoc.Options = {
           required: ['verifiedBy'],
           properties: {
             verifiedBy: { type: 'string', format: 'uuid' },
+          },
+        },
+        TokenPair: {
+          type: 'object',
+          properties: {
+            accessToken: { type: 'string', description: 'Short-lived JWT sent as Authorization: Bearer <token>' },
+            refreshToken: { type: 'string', description: 'Opaque token used with POST /auth/refresh' },
+          },
+        },
+        RegisterInput: {
+          type: 'object',
+          required: ['name', 'email', 'password'],
+          properties: {
+            name: { type: 'string', maxLength: 150 },
+            email: { type: 'string', format: 'email', maxLength: 255 },
+            password: { type: 'string', minLength: 8, maxLength: 72 },
+            dob: { type: 'string', format: 'date-time' },
+            phoneNo: { type: 'string', maxLength: 20 },
+            address: { type: 'string', maxLength: 255 },
+          },
+        },
+        LoginInput: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: { type: 'string', format: 'email', maxLength: 255 },
+            password: { type: 'string' },
+          },
+        },
+        RefreshInput: {
+          type: 'object',
+          required: ['refreshToken'],
+          properties: {
+            refreshToken: { type: 'string' },
+          },
+        },
+        LogoutInput: {
+          type: 'object',
+          required: ['refreshToken'],
+          properties: {
+            refreshToken: { type: 'string' },
           },
         },
       },
