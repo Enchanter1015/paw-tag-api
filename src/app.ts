@@ -2,8 +2,10 @@ import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 
 import { config } from './config/index.js';
+import { openApiSpec } from './docs/swagger.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { notFoundHandler } from './middleware/not-found.js';
 import { rateLimiter } from './middleware/rate-limiter.js';
@@ -29,6 +31,9 @@ export const createApp = () => {
   app.use(express.urlencoded({ extended: true, limit: '100kb' }));
   app.use(requestLogger);
   app.use(rateLimiter);
+
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+  app.get('/api/docs.json', (_req, res) => res.json(openApiSpec));
 
   app.use('/api/v1', apiRouter);
 
