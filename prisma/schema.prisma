@@ -129,6 +129,7 @@ model VetHospital {
   businessEmail     String?             @map("business_email") @db.VarChar(255)
   vetHospitalTypeId Int                 @map("vet_hospital_type_id")
   isVerified        Boolean             @default(false) @map("is_verified")
+  isArchived        Boolean             @default(false) @map("is_archived")
   createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
   createdBy         String              @map("created_by") @db.Uuid
@@ -139,6 +140,7 @@ model VetHospital {
   @@index([createdBy], map: "idx_vet_hospital_created_by")
   @@index([vetHospitalTypeId], map: "idx_vet_hospital_type")
   @@index([isVerified], map: "idx_vet_hospital_verified")
+  @@index([isArchived], map: "idx_vet_hospital_archived")
   @@map("vet_hospital")
 }
 

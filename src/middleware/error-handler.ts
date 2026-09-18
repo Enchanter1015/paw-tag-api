@@ -72,6 +72,16 @@ const normalize = (err: unknown): NormalizedError => {
     };
   }
 
+  // Raw FK RESTRICT violations (Postgres code 23001) surface as PrismaClientUnknownRequestError,
+  // not PrismaClientKnownRequestError, since Prisma has no dedicated error code for them.
+  if (err instanceof Prisma.PrismaClientUnknownRequestError && /violates RESTRICT setting/.test(err.message)) {
+    return {
+      statusCode: StatusCodes.CONFLICT,
+      code: 'FOREIGN_KEY_RESTRICT',
+      message: 'Cannot delete: this record is still referenced by other records',
+    };
+  }
+
   // Body-parser / express errors carry a status property.
   const httpErr = err as HttpLikeError;
   if (typeof httpErr?.status === 'number' && httpErr.status >= 400 && httpErr.status < 500) {

@@ -3,6 +3,7 @@ import { describe, it, mock } from 'node:test';
 
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { Prisma } from '@prisma/client';
 import { z, ZodError } from 'zod';
 
 process.env.NODE_ENV = 'test';
@@ -100,6 +101,21 @@ describe('errorHandler', () => {
     const body = getJsonBody(res);
     assert.equal(body.error.code, 'BAD_REQUEST');
     assert.equal(body.error.message, 'Unauthorized');
+  });
+
+  it('maps a raw FK RESTRICT violation to 409', () => {
+    const req = createReq();
+    const res = createRes();
+    const err = new Prisma.PrismaClientUnknownRequestError(
+      'Error occurred during query execution:\nConnectorError(... violates RESTRICT setting of foreign key constraint "medical_record_prescribed_by_fkey" on table "medical_record" ...)',
+      { clientVersion: '6.19.3' },
+    );
+
+    errorHandler(err, req, res as unknown as Response, () => {});
+
+    assert.equal((res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.CONFLICT);
+    const body = getJsonBody(res);
+    assert.equal(body.error.code, 'FOREIGN_KEY_RESTRICT');
   });
 
   it('falls back to a 500 for unrecognized errors and logs an error', () => {
