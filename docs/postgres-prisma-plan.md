@@ -157,7 +157,7 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
    - `feat(animals): DELETE /animals/:id and POST /animals/:id/merge controller + routes`
    - `test(animals): merge/remove applies and is logged with actor identity`
 
-7. **PR 7 — users module** *(no single ticket; groundwork consumed by SCRUM-48/49 below)*
+7. **PR 7 — users module** *(no single ticket; groundwork consumed by SCRUM-48/49 below)* - Done
    - `feat(users): zod schema, repository, service (409 on email/google_id/apple_id P2002)`
    - `feat(users): GET /users/:id, GET /users?email=, POST /users, PATCH /users/:id`
    - `test(users): duplicate-email 409, not-found 404, update flow`
