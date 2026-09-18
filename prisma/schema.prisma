@@ -64,24 +64,30 @@ model AnimalWeight {
 }
 
 model MedicalRecord {
-  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  medicalRecordTypeId Int               @map("medical_record_type_id")
-  title               String            @db.VarChar(200)
+  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  medicalRecordTypeId Int                @map("medical_record_type_id")
+  title               String             @db.VarChar(200)
   description         String?
-  prescribedBy        String            @map("prescribed_by") @db.Uuid
-  animalId            String            @map("animal_id") @db.VarChar(8)
-  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
-  createdBy           String            @map("created_by") @db.Uuid
-  animal              Animal            @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  creator             User              @relation(fields: [createdBy], references: [id])
-  medicalRecordType   MedicalRecordType @relation(fields: [medicalRecordTypeId], references: [id])
-  prescriber          VetHospitalMember @relation(fields: [prescribedBy], references: [id])
+  prescribedBy        String             @map("prescribed_by") @db.Uuid
+  animalId            String             @map("animal_id") @db.VarChar(8)
+  administeredAt      DateTime           @default(now()) @map("administered_at") @db.Timestamptz(6)
+  nextDueDate         DateTime?          @map("next_due_date") @db.Date
+  verifiedBy          String?            @map("verified_by") @db.Uuid
+  verifiedAt          DateTime?          @map("verified_at") @db.Timestamptz(6)
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdBy           String             @map("created_by") @db.Uuid
+  animal              Animal             @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  creator             User               @relation(fields: [createdBy], references: [id])
+  medicalRecordType   MedicalRecordType  @relation(fields: [medicalRecordTypeId], references: [id])
+  prescriber          VetHospitalMember  @relation("MedicalRecordPrescriber", fields: [prescribedBy], references: [id])
+  verifier            VetHospitalMember? @relation("MedicalRecordVerifier", fields: [verifiedBy], references: [id])
 
   @@index([animalId, createdAt(sort: Desc)], map: "idx_medical_record_animal_created")
   @@index([createdBy], map: "idx_medical_record_created_by")
   @@index([prescribedBy], map: "idx_medical_record_prescribed_by")
   @@index([medicalRecordTypeId], map: "idx_medical_record_type")
+  @@index([verifiedBy], map: "idx_medical_record_verified_by")
   @@map("medical_record")
 }
 
@@ -145,16 +151,17 @@ model VetHospital {
 }
 
 model VetHospitalMember {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  vetHospitalId  String          @map("vet_hospital_id") @db.Uuid
-  userId         String          @map("user_id") @db.Uuid
-  roleId         Int             @map("role_id")
-  joinedAt       DateTime        @default(now()) @map("joined_at") @db.Timestamptz(6)
-  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
-  medicalRecords MedicalRecord[]
-  role           Role            @relation(fields: [roleId], references: [id])
-  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vetHospital    VetHospital     @relation(fields: [vetHospitalId], references: [id], onDelete: Cascade)
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vetHospitalId     String          @map("vet_hospital_id") @db.Uuid
+  userId            String          @map("user_id") @db.Uuid
+  roleId            Int             @map("role_id")
+  joinedAt          DateTime        @default(now()) @map("joined_at") @db.Timestamptz(6)
+  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+  prescribedRecords MedicalRecord[] @relation("MedicalRecordPrescriber")
+  verifiedRecords   MedicalRecord[] @relation("MedicalRecordVerifier")
+  role              Role            @relation(fields: [roleId], references: [id])
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vetHospital       VetHospital     @relation(fields: [vetHospitalId], references: [id], onDelete: Cascade)
 
   @@unique([vetHospitalId, userId])
   @@index([roleId], map: "idx_vhm_role")
