@@ -14,7 +14,8 @@ import {
   updateVaccinationRecordSchema,
   verifyMedicalRecordSchema,
 } from './medical-records.schema.js';
-import { requireActor } from '../../middleware/actor.js';
+import { authenticate } from '../../middleware/authenticate.js';
+import { requirePermission } from '../../middleware/require-permission.js';
 import { validate } from '../../middleware/validate.js';
 
 export const medicalRecordsRouter = Router();
@@ -25,7 +26,7 @@ export const medicalRecordsRouter = Router();
  *   post:
  *     summary: Add a vaccination record for an animal
  *     tags: [MedicalRecords]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: animalId
@@ -47,7 +48,8 @@ export const medicalRecordsRouter = Router();
  */
 medicalRecordsRouter.post(
   '/animals/:animalId/medical-records',
-  requireActor,
+  authenticate,
+  requirePermission('medical-records:write'),
   validate({ params: animalMedicalRecordsParamsSchema, body: createVaccinationRecordSchema }),
   addVaccinationRecord,
 );
@@ -108,7 +110,7 @@ medicalRecordsRouter.get(
  *   patch:
  *     summary: Update a vaccination record
  *     tags: [MedicalRecords]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -130,7 +132,8 @@ medicalRecordsRouter.get(
  */
 medicalRecordsRouter.patch(
   '/medical-records/:id',
-  requireActor,
+  authenticate,
+  requirePermission('medical-records:write'),
   validate({ params: medicalRecordIdParamsSchema, body: updateVaccinationRecordSchema }),
   updateVaccinationRecord,
 );
@@ -141,7 +144,7 @@ medicalRecordsRouter.patch(
  *   patch:
  *     summary: Verify a medical record
  *     tags: [MedicalRecords]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -163,7 +166,8 @@ medicalRecordsRouter.patch(
  */
 medicalRecordsRouter.patch(
   '/medical-records/:id/verify',
-  requireActor,
+  authenticate,
+  requirePermission('medical-records:verify'),
   validate({ params: medicalRecordIdParamsSchema, body: verifyMedicalRecordSchema }),
   verifyMedicalRecord,
 );

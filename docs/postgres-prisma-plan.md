@@ -1,7 +1,8 @@
 # Plan: Postgres (Prisma) + TypeScript for paw-tag-api
 
-Status: in progress — Phases 1-4 complete, Phases 5-7 not yet implemented.
-Last updated: 2026-09-17
+Status: in progress — Phases 1-4 complete, Phase 5 mostly complete (PR 1-9 done, PR 10-13 won't do,
+PR 14 to do), Phase 8 PR 15-17 done (PR 18 input sanitisation to do), Phases 6-7 not yet implemented.
+Last updated: 2026-09-18
 
 ## Locked decisions
 
@@ -14,7 +15,13 @@ Last updated: 2026-09-17
 - Schema is **already applied** in Layerbase. `pawtag-20260914-104111.dump` is reference only.
 - Modules: **animals (+owners), users, vet hospitals (+members), medical records**.
 - Add **`updated_at`** columns via a Prisma migration.
-- Out of scope: auth layer, a tags module (no such table), Layerbase HTTP query API, caching.
+- **Auth (locked 2026-09-18):** JWT-based, replacing the `x-user-id` actor header entirely.
+  Credential is email + password (`user.password_hash`, bcrypt/argon2id). Access token is
+  short-lived JWT; refresh token is opaque, stored **hashed** in a new `refresh_token` table,
+  rotated on use, revocable. Authorization is RBAC via a new `permission` + `role_permission`
+  table pair layered on the existing `role` table (`user.role_id` is a new platform-level role,
+  distinct from `vet_hospital_member.role_id` which stays hospital-scoped). See Phase 8.
+- Out of scope: a tags module (no such table), Layerbase HTTP query API, caching.
 
 ## Verified schema
 
@@ -206,13 +213,76 @@ depends on schema/plumbing already merged (Phases 1-4) and, where noted, an earl
 
 **Deferred / out of scope for this phase** (ticket exists but has no matching table or is explicitly
 out of scope per "Locked decisions" above — revisit in a separate plan):
-- SCRUM-19/20/21/22 (auth, sessions, RBAC, input-sanitisation middleware) — no auth layer yet;
-  `x-user-id` actor header is the temporary stand-in (see Phase 3 notes).
 - SCRUM-44/45 (QR generation/resolution) — no tag/QR table in the schema.
 - SCRUM-52 (dashboard/KPI stats) — candidate for a later "reporting" module once Phase 5 data exists.
 - SCRUM-54 (GPS location support) — check whether `animal` already has lat/lng columns before
   scoping a PR; if not, needs its own migration first.
 - SCRUM-58/59 (offline sync, automated backups) — infrastructure/ops work, not a REST module.
+
+## Phase 8 — Auth layer: JWT + RBAC (depends on 2, 3; supersedes Phase 3 item 4)
+
+**PR 15-17 done (2026-09-18); PR 18 to do.** Retrofits real authentication onto the modules
+built in Phase 5, replacing the `x-user-id` actor stand-in. Mapped tickets: SCRUM-19 (auth),
+SCRUM-20 (sessions/refresh), SCRUM-21 (RBAC), SCRUM-22 (input sanitisation).
+
+### Schema additions (additive migration, no drops)
+1. `user.password_hash varchar(255) NULL` — nullable because existing rows have no password;
+   users created via the current API have none yet either, so a follow-up "set password" flow
+   is required before they can log in (tracked as a note, not a blocking PR below).
+2. `user.role_id int NOT NULL REFERENCES role(id)`, default pointed at a seeded `User` role.
+   This is a **platform-level** role and is unrelated to `vet_hospital_member.role_id`
+   (hospital-scoped membership role), which is untouched.
+3. `permission (id serial PK, name varchar(100) UNIQUE NOT NULL)` — e.g. `animals:write`,
+   `users:manage`, `medical-records:verify`.
+4. `role_permission (role_id int REFERENCES role, permission_id int REFERENCES permission,
+   PRIMARY KEY (role_id, permission_id))`, `ON DELETE CASCADE` both FKs.
+5. `refresh_token (id uuid PK DEFAULT gen_random_uuid(), user_id uuid REFERENCES user
+   ON DELETE CASCADE, token_hash varchar(255) UNIQUE NOT NULL, expires_at timestamptz NOT NULL,
+   revoked_at timestamptz NULL, created_at timestamptz DEFAULT now())`, index on `user_id`.
+   Only the hash of the refresh token is ever persisted.
+6. Seed data: `role` rows (`Admin`, `User`, ...), `permission` rows per module, and the
+   `role_permission` rows wiring them together.
+
+### New module: `src/modules/auth/`
+Same shape as other modules — `auth.schema.ts` (`registerSchema`, `loginSchema`,
+`refreshSchema`), `auth.repository.ts` (user-by-email lookup, refresh-token CRUD),
+`auth.service.ts` (`register`, `login`, `refresh`, `logout`), `auth.controller.ts` /
+`auth.routes.ts` mounting `POST /auth/register|login|refresh|logout`.
+
+### Middleware
+- `src/middleware/authenticate.ts` replaces `src/middleware/actor.ts`: verifies the
+  `Authorization: Bearer <JWT>` header, sets `req.actorId` (+ role) from the token `sub`/`role`
+  claims, 401 on missing/invalid/expired token.
+- `src/middleware/require-permission.ts`: `requirePermission(name)` looks up the actor's role
+  permissions and returns 403 when missing; layered on top of `authenticate` for routes that
+  need more than "any authenticated user" (e.g. admin-only user management, verification flags).
+- All existing write routes swap `requireActor` → `authenticate` (+ `requirePermission` where
+  scoped); `middleware/actor.ts` is deleted once the swap is complete.
+
+### Config / secrets
+`src/config/index.ts` gains `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `JWT_ACCESS_TTL` (e.g.
+`15m`), `JWT_REFRESH_TTL` (e.g. `30d`), `BCRYPT_COST`. Never log tokens, password hashes, or
+refresh token hashes; the error handler must keep suppressing `err.meta` in production.
+
+### PRs
+15. **PR 15 — SCRUM-19 Auth schema + register/login (JWT issuance)** - Done
+    - migration: `password_hash` + `role_id` on `user`; `permission`, `role_permission`,
+      `refresh_token` tables; seed roles/permissions
+    - `feat(auth): schema/repository/service/controller/routes for register + login`
+    - `test(auth): register hashes the password, login issues a valid access+refresh pair,
+      wrong password 401`
+16. **PR 16 — SCRUM-20 Refresh + logout** *(depends on PR 15)* - Done
+    - `feat(auth): POST /auth/refresh rotates the refresh token, POST /auth/logout revokes it`
+    - `test(auth): expired/reused/revoked refresh tokens rejected, rotation issues a fresh pair`
+17. **PR 17 — SCRUM-21 RBAC middleware, replace x-user-id everywhere** *(depends on PR 15)* - Done
+    - `feat(middleware): authenticate + requirePermission; delete middleware/actor.ts`
+    - `chore(routes): swap requireActor → authenticate (+ requirePermission where scoped) across
+      animals/users/vet-hospitals/medical-records`
+    - `test: 401 without/invalid token, 403 without permission, actorId sourced from the JWT`
+18. **PR 18 — SCRUM-22 Input-sanitisation middleware** *(independent)*
+    - `feat(middleware): request body/query sanitisation (trim, strip HTML, size caps) ahead of
+      zod validation`
+    - `test: rejects/strips malicious payloads without breaking valid input`
 
 ## Phase 6 — Integration tests (depends on 5)
 
@@ -249,7 +319,9 @@ out of scope per "Locked decisions" above — revisit in a separate plan):
 
 ## Further considerations
 
-1. The `x-user-id` actor header is a deliberate stopgap; real Google/Apple auth is a separate plan.
+1. The `x-user-id` actor header is superseded by the JWT auth layer in Phase 8; Google/Apple
+   OAuth login (exchanging an id_token for our JWT, using the existing `google_id`/`apple_id`
+   columns) remains a separate follow-up, not covered by Phase 8's email+password flow.
 2. The repo is named `paw-tag-api` but there is **no tag table**. Confirm whether a physical tag
    entity is still coming — it would likely be 1:1 with `animal`, using the 8-char id as the
    printed code.

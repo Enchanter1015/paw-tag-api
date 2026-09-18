@@ -1,9 +1,16 @@
 import type { CreateUserInput, UpdateUserInput } from './users.schema.js';
 import { usersRepository } from './users.repository.js';
-import { NotFoundError } from '../../lib/errors.js';
+import { BadRequestError, NotFoundError } from '../../lib/errors.js';
 
 export const usersService = {
-  register: (input: CreateUserInput) => usersRepository.create(input),
+  register: async (input: CreateUserInput) => {
+    const role = await usersRepository.findDefaultRole();
+    if (!role) {
+      throw new BadRequestError("Default 'User' role is not configured");
+    }
+    // Created without a password; the user can only authenticate once one is set via POST /auth/register.
+    return usersRepository.create({ ...input, roleId: role.id });
+  },
   getById: async (id: string) => {
     const user = await usersRepository.findById(id);
     if (!user) {

@@ -19,7 +19,8 @@ import {
   vetHospitalIdParamsSchema,
   vetHospitalMemberParamsSchema,
 } from './vet-hospitals.schema.js';
-import { requireActor } from '../../middleware/actor.js';
+import { authenticate } from '../../middleware/authenticate.js';
+import { requirePermission } from '../../middleware/require-permission.js';
 import { validate } from '../../middleware/validate.js';
 
 export const vetHospitalsRouter = Router();
@@ -30,7 +31,7 @@ export const vetHospitalsRouter = Router();
  *   post:
  *     summary: Register a vet hospital
  *     tags: [VetHospitals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -46,7 +47,8 @@ export const vetHospitalsRouter = Router();
  */
 vetHospitalsRouter.post(
   '/vet-hospitals',
-  requireActor,
+  authenticate,
+  requirePermission('vet-hospitals:write'),
   validate({ body: createVetHospitalSchema }),
   registerVetHospital,
 );
@@ -101,7 +103,7 @@ vetHospitalsRouter.get(
  *   patch:
  *     summary: Update a vet hospital
  *     tags: [VetHospitals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -123,7 +125,8 @@ vetHospitalsRouter.get(
  */
 vetHospitalsRouter.patch(
   '/vet-hospitals/:id',
-  requireActor,
+  authenticate,
+  requirePermission('vet-hospitals:write'),
   validate({ params: vetHospitalIdParamsSchema, body: updateVetHospitalSchema }),
   updateVetHospital,
 );
@@ -135,7 +138,7 @@ vetHospitalsRouter.patch(
  *     summary: Archive a vet hospital
  *     description: Soft-deletes the vet hospital by setting isArchived to true. Archived hospitals are excluded from search results.
  *     tags: [VetHospitals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -147,7 +150,8 @@ vetHospitalsRouter.patch(
  */
 vetHospitalsRouter.delete(
   '/vet-hospitals/:id',
-  requireActor,
+  authenticate,
+  requirePermission('vet-hospitals:manage'),
   validate({ params: vetHospitalIdParamsSchema }),
   removeVetHospital,
 );
@@ -158,7 +162,7 @@ vetHospitalsRouter.delete(
  *   post:
  *     summary: Add a member to a vet hospital
  *     tags: [VetHospitals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -181,7 +185,8 @@ vetHospitalsRouter.delete(
  */
 vetHospitalsRouter.post(
   '/vet-hospitals/:id/members',
-  requireActor,
+  authenticate,
+  requirePermission('vet-hospitals:manage'),
   validate({ params: vetHospitalIdParamsSchema, body: addVetHospitalMemberSchema }),
   addVetHospitalMember,
 );
@@ -217,7 +222,7 @@ vetHospitalsRouter.get(
  *   patch:
  *     summary: Update a vet hospital member's role
  *     tags: [VetHospitals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -243,7 +248,8 @@ vetHospitalsRouter.get(
  */
 vetHospitalsRouter.patch(
   '/vet-hospitals/:id/members/:memberId',
-  requireActor,
+  authenticate,
+  requirePermission('vet-hospitals:manage'),
   validate({ params: vetHospitalMemberParamsSchema, body: updateVetHospitalMemberSchema }),
   updateVetHospitalMember,
 );
@@ -254,7 +260,7 @@ vetHospitalsRouter.patch(
  *   delete:
  *     summary: Remove a member from a vet hospital
  *     tags: [VetHospitals]
- *     security: [{ ActorId: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -270,7 +276,8 @@ vetHospitalsRouter.patch(
  */
 vetHospitalsRouter.delete(
   '/vet-hospitals/:id/members/:memberId',
-  requireActor,
+  authenticate,
+  requirePermission('vet-hospitals:manage'),
   validate({ params: vetHospitalMemberParamsSchema }),
   removeVetHospitalMember,
 );
