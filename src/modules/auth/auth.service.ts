@@ -48,6 +48,9 @@ export const authService = {
     if (!user?.passwordHash || !(await passwordService.verifyPassword(input.password, user.passwordHash))) {
       throw new UnauthorizedError('Invalid email or password');
     }
+    if (!user.isActive) {
+      throw new UnauthorizedError('Account is deactivated');
+    }
 
     return issueTokenPair(user);
   },
@@ -63,7 +66,7 @@ export const authService = {
     await authRepository.revokeRefreshToken(stored.id);
 
     const user = await authRepository.findUserById(stored.userId);
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedError('Invalid or expired refresh token');
     }
 

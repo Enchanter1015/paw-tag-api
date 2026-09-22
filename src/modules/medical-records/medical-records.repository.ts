@@ -19,9 +19,9 @@ export const medicalRecordsRepository = {
     client.medicalRecord.findUnique({ where: { id } }),
   update: (id: string, data: Prisma.MedicalRecordUncheckedUpdateInput, client: PrismaClientOrTx = prisma) =>
     client.medicalRecord.update({ where: { id }, data }),
-  listByAnimal: (animalId: string, medicalRecordTypeId: number, client: PrismaClientOrTx = prisma) =>
+  listByAnimal: (animalId: string, client: PrismaClientOrTx = prisma) =>
     client.medicalRecord.findMany({
-      where: { animalId, medicalRecordTypeId },
+      where: { animalId },
       orderBy: { createdAt: 'desc' },
     }),
 };

@@ -11,6 +11,8 @@ export const usersRepository = {
   findById: (id: string, client: PrismaClientOrTx = prisma) => client.user.findUnique({ where: { id } }),
   findByEmail: (email: string, client: PrismaClientOrTx = prisma) =>
     client.user.findUnique({ where: { email } }),
+  list: (client: PrismaClientOrTx = prisma) => client.user.findMany({ orderBy: { name: 'asc' } }),
+  findRoleById: (id: number, client: PrismaClientOrTx = prisma) => client.role.findUnique({ where: { id } }),
   update: (id: string, data: Prisma.UserUncheckedUpdateInput, client: PrismaClientOrTx = prisma) =>
     client.user.update({ where: { id }, data }),
 };

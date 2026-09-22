@@ -3,7 +3,7 @@ import { Router } from 'express';
 import {
   addVaccinationRecord,
   getMedicalRecord,
-  listVaccinationRecords,
+  listMedicalRecords,
   updateVaccinationRecord,
   verifyMedicalRecord,
 } from './medical-records.controller.js';
@@ -58,7 +58,7 @@ medicalRecordsRouter.post(
  * @openapi
  * /animals/{animalId}/medical-records:
  *   get:
- *     summary: List vaccination records for an animal
+ *     summary: List all medical records for an animal
  *     tags: [MedicalRecords]
  *     parameters:
  *       - in: path
@@ -67,7 +67,7 @@ medicalRecordsRouter.post(
  *         schema: { type: string, minLength: 8, maxLength: 8 }
  *     responses:
  *       200:
- *         description: Vaccination records ordered newest first
+ *         description: Medical records ordered newest first
  *         content:
  *           application/json:
  *             schema: { type: array, items: { $ref: '#/components/schemas/MedicalRecord' } }
@@ -76,7 +76,7 @@ medicalRecordsRouter.post(
 medicalRecordsRouter.get(
   '/animals/:animalId/medical-records',
   validate({ params: animalMedicalRecordsParamsSchema }),
-  listVaccinationRecords,
+  listMedicalRecords,
 );
 
 /**

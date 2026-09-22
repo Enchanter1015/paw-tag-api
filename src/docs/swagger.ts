@@ -93,6 +93,8 @@ const options: swaggerJsdoc.Options = {
             appleId: { type: 'string', nullable: true },
             phoneNo: { type: 'string', nullable: true, example: '5551234567' },
             address: { type: 'string', nullable: true },
+            roleId: { type: 'integer' },
+            isActive: { type: 'boolean' },
             updatedAt: { type: 'string', format: 'date-time' },
           },
         },

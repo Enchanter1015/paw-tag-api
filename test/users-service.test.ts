@@ -92,3 +92,57 @@ describe('usersService.update', () => {
     update.mock.restore();
   });
 });
+
+describe('usersService.list', () => {
+  it('delegates to the repository', async () => {
+    const users = [{ id: 'user-1', name: 'Jane' }];
+    const list = mock.method(usersRepository, 'list', async () => users);
+
+    const result = await usersService.list();
+
+    assert.deepEqual(result, users);
+
+    list.mock.restore();
+  });
+});
+
+describe('usersService.changeRole', () => {
+  it('updates the role when it exists', async () => {
+    const updated = { id: 'user-1', roleId: 2 };
+    const findRoleById = mock.method(usersRepository, 'findRoleById', async () => ({ id: 2, name: 'Admin' }));
+    const update = mock.method(usersRepository, 'update', async () => updated);
+
+    const result = await usersService.changeRole('user-1', { roleId: 2 });
+
+    assert.equal(findRoleById.mock.calls[0]!.arguments[0], 2);
+    assert.equal(update.mock.calls[0]!.arguments[0], 'user-1');
+    assert.deepEqual(update.mock.calls[0]!.arguments[1], { roleId: 2 });
+    assert.deepEqual(result, updated);
+
+    findRoleById.mock.restore();
+    update.mock.restore();
+  });
+
+  it('throws BadRequestError when the role does not exist', async () => {
+    const findRoleById = mock.method(usersRepository, 'findRoleById', async () => null);
+
+    await assert.rejects(() => usersService.changeRole('user-1', { roleId: 999 }), BadRequestError);
+
+    findRoleById.mock.restore();
+  });
+});
+
+describe('usersService.setActive', () => {
+  it('delegates to the repository with isActive: false', async () => {
+    const updated = { id: 'user-1', isActive: false };
+    const update = mock.method(usersRepository, 'update', async () => updated);
+
+    const result = await usersService.setActive('user-1', false);
+
+    assert.equal(update.mock.calls[0]!.arguments[0], 'user-1');
+    assert.deepEqual(update.mock.calls[0]!.arguments[1], { isActive: false });
+    assert.deepEqual(result, updated);
+
+    update.mock.restore();
+  });
+});

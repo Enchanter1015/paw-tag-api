@@ -28,3 +28,9 @@ export const findUserQuerySchema = z.object({
 });
 
 export type FindUserQuery = z.infer<typeof findUserQuerySchema>;
+
+export const changeUserRoleSchema = z.object({
+  roleId: z.number().int().positive(),
+});
+
+export type ChangeUserRoleInput = z.infer<typeof changeUserRoleSchema>;

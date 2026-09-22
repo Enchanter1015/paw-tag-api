@@ -1,4 +1,4 @@
-import type { CreateUserInput, UpdateUserInput } from './users.schema.js';
+import type { ChangeUserRoleInput, CreateUserInput, UpdateUserInput } from './users.schema.js';
 import { usersRepository } from './users.repository.js';
 import { BadRequestError, NotFoundError } from '../../lib/errors.js';
 
@@ -28,5 +28,18 @@ export const usersService = {
   update: async (id: string, input: UpdateUserInput) => {
     // P2025 (not found) and P2002 (duplicate email/google_id/apple_id) are mapped by the global error handler.
     return usersRepository.update(id, input);
+  },
+  list: async () => usersRepository.list(),
+  changeRole: async (id: string, input: ChangeUserRoleInput) => {
+    const role = await usersRepository.findRoleById(input.roleId);
+    if (!role) {
+      throw new BadRequestError(`Role ${input.roleId} does not exist`);
+    }
+    // P2025 (not found) is mapped by the global error handler.
+    return usersRepository.update(id, { roleId: input.roleId });
+  },
+  setActive: async (id: string, isActive: boolean) => {
+    // P2025 (not found) is mapped by the global error handler.
+    return usersRepository.update(id, { isActive });
   },
 };
