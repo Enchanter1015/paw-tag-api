@@ -44,6 +44,18 @@ const options: swaggerJsdoc.Options = {
             createdBy: { type: 'string', format: 'uuid', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
+            images: { type: 'array', items: { $ref: '#/components/schemas/AnimalImage' } },
+          },
+        },
+        AnimalImage: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            animalId: { type: 'string', example: 'a1b2c3d4' },
+            s3Key: { type: 'string' },
+            url: { type: 'string', format: 'uri' },
+            createdBy: { type: 'string', format: 'uuid' },
+            createdAt: { type: 'string', format: 'date-time' },
           },
         },
         CreateAnimalInput: {
@@ -205,6 +217,18 @@ const options: swaggerJsdoc.Options = {
             createdBy: { type: 'string', format: 'uuid' },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
+            images: { type: 'array', items: { $ref: '#/components/schemas/MedicalRecordImage' } },
+          },
+        },
+        MedicalRecordImage: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            medicalRecordId: { type: 'string', format: 'uuid' },
+            s3Key: { type: 'string' },
+            url: { type: 'string', format: 'uri' },
+            createdBy: { type: 'string', format: 'uuid' },
+            createdAt: { type: 'string', format: 'date-time' },
           },
         },
         CreateVaccinationRecordInput: {

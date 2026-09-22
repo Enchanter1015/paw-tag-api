@@ -327,3 +327,13 @@ refresh token hashes; the error handler must keep suppressing `err.meta` in prod
    printed code.
 3. The dump sits in the repo root with real-looking data. Decide: gitignore, move under `db/`,
    or remove.
+
+   Implement image uploading endpoint and place the images at s3 bucket 
+   each medical report can has multiple images
+      - file name should be UUID,
+      - send images as a list with medical object
+   animal profile can have multiple images
+      - file name should be UUID,
+      - send images as a list with animal profile object
+   compress every image before upload
+   

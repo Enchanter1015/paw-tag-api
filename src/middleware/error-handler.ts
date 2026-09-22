@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import type { ErrorRequestHandler } from 'express';
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
+import { MulterError } from 'multer';
 import { ZodError } from 'zod';
 
 import { config } from '../config/index.js';
@@ -32,6 +33,14 @@ const normalize = (err: unknown): NormalizedError => {
       code: err.code,
       message: err.message,
       details: err.details,
+    };
+  }
+
+  if (err instanceof MulterError) {
+    return {
+      statusCode: StatusCodes.BAD_REQUEST,
+      code: `UPLOAD_${err.code}`,
+      message: err.message,
     };
   }
 

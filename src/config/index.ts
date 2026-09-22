@@ -18,6 +18,13 @@ const envSchema = z.object({
   JWT_ACCESS_TTL: z.string().default('15m'),
   JWT_REFRESH_TTL: z.string().default('30d'),
   BCRYPT_COST: z.coerce.number().int().min(10).max(15).default(12),
+  AWS_REGION: z.string().min(1),
+  AWS_S3_BUCKET: z.string().min(1),
+  AWS_ACCESS_KEY_ID: z.string().min(1).optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  AWS_S3_ENDPOINT: z.string().url().optional(),
+  MAX_IMAGE_UPLOAD_MB: z.coerce.number().int().positive().default(10),
+  MAX_IMAGES_PER_UPLOAD: z.coerce.number().int().positive().default(10),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -59,5 +66,14 @@ export const config = Object.freeze({
     accessTtl: env.JWT_ACCESS_TTL,
     refreshTtl: env.JWT_REFRESH_TTL,
     bcryptCost: env.BCRYPT_COST,
+  },
+  s3: {
+    region: env.AWS_REGION,
+    bucket: env.AWS_S3_BUCKET,
+    accessKeyId: env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+    endpoint: env.AWS_S3_ENDPOINT,
+    maxUploadBytes: env.MAX_IMAGE_UPLOAD_MB * 1024 * 1024,
+    maxImagesPerUpload: env.MAX_IMAGES_PER_UPLOAD,
   },
 } as const);
