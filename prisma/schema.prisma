@@ -138,6 +138,7 @@ model User {
   email                  String              @unique @db.VarChar(255)
   passwordHash           String?             @map("password_hash") @db.VarChar(255)
   roleId                 Int                 @map("role_id")
+  isActive               Boolean             @default(true) @map("is_active")
   updatedAt              DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
   role                   Role                @relation(fields: [roleId], references: [id])
   animals                Animal[]

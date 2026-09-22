@@ -15,8 +15,8 @@ export const addVaccinationRecord = asyncHandler(async (req: Request, res: Respo
   res.status(StatusCodes.CREATED).json(record);
 });
 
-export const listVaccinationRecords = asyncHandler(async (req: Request, res: Response) => {
-  const records = await medicalRecordsService.listVaccinationRecords(req.params.animalId!);
+export const listMedicalRecords = asyncHandler(async (req: Request, res: Response) => {
+  const records = await medicalRecordsService.listMedicalRecords(req.params.animalId!);
   res.status(StatusCodes.OK).json(records);
 });
 

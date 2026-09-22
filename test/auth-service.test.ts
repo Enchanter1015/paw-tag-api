@@ -12,7 +12,7 @@ const { tokenService } = await import('../src/lib/tokens.js');
 const { BadRequestError, ConflictError, UnauthorizedError } = await import('../src/lib/errors.js');
 
 const role = { id: 2, name: 'User' };
-const user = { id: 'user-1', email: 'jane@example.com', passwordHash: 'hashed', roleId: 2, role };
+const user = { id: 'user-1', email: 'jane@example.com', passwordHash: 'hashed', roleId: 2, role, isActive: true };
 
 describe('authService.register', () => {
   it('creates a user with a hashed password under the default role and returns a token pair', async () => {
@@ -149,6 +149,19 @@ describe('authService.login', () => {
     findUserByEmail.mock.restore();
     verifyPassword.mock.restore();
   });
+
+  it('throws UnauthorizedError when the account is deactivated', async () => {
+    const findUserByEmail = mock.method(authRepository, 'findUserByEmail', async () => ({ ...user, isActive: false }));
+    const verifyPassword = mock.method(passwordService, 'verifyPassword', async () => true);
+
+    await assert.rejects(
+      () => authService.login({ email: 'jane@example.com', password: 'password123' }),
+      UnauthorizedError,
+    );
+
+    findUserByEmail.mock.restore();
+    verifyPassword.mock.restore();
+  });
 });
 
 describe('authService.refresh', () => {
@@ -210,6 +223,21 @@ describe('authService.refresh', () => {
 
     hashRefreshToken.mock.restore();
     findRefreshTokenByHash.mock.restore();
+  });
+
+  it('throws UnauthorizedError when the account is deactivated', async () => {
+    const stored = { id: 'rt-1', userId: 'user-1', revokedAt: null, expiresAt: new Date('2999-01-01') };
+    const hashRefreshToken = mock.method(tokenService, 'hashRefreshToken', () => 'hash');
+    const findRefreshTokenByHash = mock.method(authRepository, 'findRefreshTokenByHash', async () => stored);
+    const revokeRefreshToken = mock.method(authRepository, 'revokeRefreshToken', async () => ({}));
+    const findUserById = mock.method(authRepository, 'findUserById', async () => ({ ...user, isActive: false }));
+
+    await assert.rejects(() => authService.refresh({ refreshToken: 'presented-token' }), UnauthorizedError);
+
+    hashRefreshToken.mock.restore();
+    findRefreshTokenByHash.mock.restore();
+    revokeRefreshToken.mock.restore();
+    findUserById.mock.restore();
   });
 });
 

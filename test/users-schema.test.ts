@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  changeUserRoleSchema,
   createUserSchema,
   findUserQuerySchema,
   updateUserSchema,
@@ -51,5 +52,19 @@ describe('findUserQuerySchema', () => {
 
   it('rejects a missing email', () => {
     assert.equal(findUserQuerySchema.safeParse({}).success, false);
+  });
+});
+
+describe('changeUserRoleSchema', () => {
+  it('accepts a positive integer roleId', () => {
+    assert.equal(changeUserRoleSchema.safeParse({ roleId: 1 }).success, true);
+  });
+
+  it('rejects a missing roleId', () => {
+    assert.equal(changeUserRoleSchema.safeParse({}).success, false);
+  });
+
+  it('rejects a non-positive roleId', () => {
+    assert.equal(changeUserRoleSchema.safeParse({ roleId: 0 }).success, false);
   });
 });

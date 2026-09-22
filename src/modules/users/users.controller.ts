@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import type { CreateUserInput, FindUserQuery, UpdateUserInput } from './users.schema.js';
+import type { ChangeUserRoleInput, CreateUserInput, FindUserQuery, UpdateUserInput } from './users.schema.js';
 import { usersService } from './users.service.js';
 import { asyncHandler } from '../../lib/async-handler.js';
 
@@ -25,5 +25,26 @@ export const findUserByEmail = asyncHandler(async (req: Request, res: Response) 
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as UpdateUserInput;
   const user = await usersService.update(req.params.id!, input);
+  res.status(StatusCodes.OK).json(user);
+});
+
+export const listUsers = asyncHandler(async (_req: Request, res: Response) => {
+  const users = await usersService.list();
+  res.status(StatusCodes.OK).json(users);
+});
+
+export const changeUserRole = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as ChangeUserRoleInput;
+  const user = await usersService.changeRole(req.params.id!, input);
+  res.status(StatusCodes.OK).json(user);
+});
+
+export const deactivateUser = asyncHandler(async (req: Request, res: Response) => {
+  const user = await usersService.setActive(req.params.id!, false);
+  res.status(StatusCodes.OK).json(user);
+});
+
+export const activateUser = asyncHandler(async (req: Request, res: Response) => {
+  const user = await usersService.setActive(req.params.id!, true);
   res.status(StatusCodes.OK).json(user);
 });

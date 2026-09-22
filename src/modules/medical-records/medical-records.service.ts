@@ -4,18 +4,7 @@ import type {
   VerifyMedicalRecordInput,
 } from './medical-records.schema.js';
 import { medicalRecordsRepository } from './medical-records.repository.js';
-import { BadRequestError, NotFoundError } from '../../lib/errors.js';
-
-// Type ids are environment-seeded data, so the vaccination type is resolved by name rather than a fixed id.
-const VACCINATION_TYPE_NAME = 'Vaccination';
-
-const getVaccinationTypeId = async () => {
-  const type = await medicalRecordsRepository.findTypeByName(VACCINATION_TYPE_NAME);
-  if (!type) {
-    throw new BadRequestError(`Medical record type '${VACCINATION_TYPE_NAME}' is not configured`);
-  }
-  return type.id;
-};
+import { NotFoundError } from '../../lib/errors.js';
 
 const assertAnimalExists = async (animalId: string) => {
   const animal = await medicalRecordsRepository.findAnimalById(animalId);
@@ -56,10 +45,9 @@ export const medicalRecordsService = {
     }
     return record;
   },
-  listVaccinationRecords: async (animalId: string) => {
+  listMedicalRecords: async (animalId: string) => {
     await assertAnimalExists(animalId);
-    const medicalRecordTypeId = await getVaccinationTypeId();
-    return medicalRecordsRepository.listByAnimal(animalId, medicalRecordTypeId);
+    return medicalRecordsRepository.listByAnimal(animalId);
   },
   updateVaccinationRecord: async (id: string, input: UpdateVaccinationRecordInput) => {
     await medicalRecordsService.getById(id);
