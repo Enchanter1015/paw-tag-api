@@ -23,6 +23,7 @@ model Animal {
   owners         AnimalOwner[]
   weights        AnimalWeight[]
   medicalRecords MedicalRecord[]
+  images         AnimalImage[]
 
   @@index([createdBy], map: "idx_animal_created_by")
   @@index([isStreet], map: "idx_animal_is_street")
@@ -63,25 +64,54 @@ model AnimalWeight {
   @@map("animal_weight")
 }
 
+model AnimalImage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  animalId  String   @map("animal_id") @db.VarChar(8)
+  s3Key     String   @map("s3_key") @db.VarChar(255)
+  url       String   @db.VarChar(1000)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdBy String   @map("created_by") @db.Uuid
+  animal    Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  creator   User     @relation(fields: [createdBy], references: [id])
+
+  @@index([animalId], map: "idx_animal_image_animal")
+  @@map("animal_image")
+}
+
+model MedicalRecordImage {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  medicalRecordId String        @map("medical_record_id") @db.Uuid
+  s3Key           String        @map("s3_key") @db.VarChar(255)
+  url             String        @db.VarChar(1000)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdBy       String        @map("created_by") @db.Uuid
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  creator         User          @relation(fields: [createdBy], references: [id])
+
+  @@index([medicalRecordId], map: "idx_medical_record_image_record")
+  @@map("medical_record_image")
+}
+
 model MedicalRecord {
-  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  medicalRecordTypeId Int                @map("medical_record_type_id")
-  title               String             @db.VarChar(200)
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  medicalRecordTypeId Int                  @map("medical_record_type_id")
+  title               String               @db.VarChar(200)
   description         String?
-  prescribedBy        String             @map("prescribed_by") @db.Uuid
-  animalId            String             @map("animal_id") @db.VarChar(8)
-  administeredAt      DateTime           @default(now()) @map("administered_at") @db.Timestamptz(6)
-  nextDueDate         DateTime?          @map("next_due_date") @db.Date
-  verifiedBy          String?            @map("verified_by") @db.Uuid
-  verifiedAt          DateTime?          @map("verified_at") @db.Timestamptz(6)
-  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt           DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
-  createdBy           String             @map("created_by") @db.Uuid
-  animal              Animal             @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  creator             User               @relation(fields: [createdBy], references: [id])
-  medicalRecordType   MedicalRecordType  @relation(fields: [medicalRecordTypeId], references: [id])
-  prescriber          VetHospitalMember  @relation("MedicalRecordPrescriber", fields: [prescribedBy], references: [id])
-  verifier            VetHospitalMember? @relation("MedicalRecordVerifier", fields: [verifiedBy], references: [id])
+  prescribedBy        String               @map("prescribed_by") @db.Uuid
+  animalId            String               @map("animal_id") @db.VarChar(8)
+  administeredAt      DateTime             @default(now()) @map("administered_at") @db.Timestamptz(6)
+  nextDueDate         DateTime?            @map("next_due_date") @db.Date
+  verifiedBy          String?              @map("verified_by") @db.Uuid
+  verifiedAt          DateTime?            @map("verified_at") @db.Timestamptz(6)
+  createdAt           DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdBy           String               @map("created_by") @db.Uuid
+  animal              Animal               @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  creator             User                 @relation(fields: [createdBy], references: [id])
+  medicalRecordType   MedicalRecordType    @relation(fields: [medicalRecordTypeId], references: [id])
+  prescriber          VetHospitalMember    @relation("MedicalRecordPrescriber", fields: [prescribedBy], references: [id])
+  verifier            VetHospitalMember?   @relation("MedicalRecordVerifier", fields: [verifiedBy], references: [id])
+  images              MedicalRecordImage[]
 
   @@index([animalId, createdAt(sort: Desc)], map: "idx_medical_record_animal_created")
   @@index([createdBy], map: "idx_medical_record_created_by")
@@ -128,25 +158,27 @@ model RolePermission {
 }
 
 model User {
-  id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                   String              @db.VarChar(150)
-  dob                    DateTime?           @db.Date
-  googleId               String?             @unique @map("google_id") @db.VarChar(255)
-  appleId                String?             @unique @map("apple_id") @db.VarChar(255)
-  phoneNo                String?             @map("phone_no") @db.VarChar(20)
-  address                String?             @db.VarChar(255)
-  email                  String              @unique @db.VarChar(255)
-  passwordHash           String?             @map("password_hash") @db.VarChar(255)
-  roleId                 Int                 @map("role_id")
-  isActive               Boolean             @default(true) @map("is_active")
-  updatedAt              DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
-  role                   Role                @relation(fields: [roleId], references: [id])
+  id                     String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String               @db.VarChar(150)
+  dob                    DateTime?            @db.Date
+  googleId               String?              @unique @map("google_id") @db.VarChar(255)
+  appleId                String?              @unique @map("apple_id") @db.VarChar(255)
+  phoneNo                String?              @map("phone_no") @db.VarChar(20)
+  address                String?              @db.VarChar(255)
+  email                  String               @unique @db.VarChar(255)
+  passwordHash           String?              @map("password_hash") @db.VarChar(255)
+  roleId                 Int                  @map("role_id")
+  isActive               Boolean              @default(true) @map("is_active")
+  updatedAt              DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  role                   Role                 @relation(fields: [roleId], references: [id])
   animals                Animal[]
   animalOwners           AnimalOwner[]
   medicalRecords         MedicalRecord[]
   vetHospitals           VetHospital[]
   vetHospitalMemberships VetHospitalMember[]
   refreshTokens          RefreshToken[]
+  animalImages           AnimalImage[]
+  medicalRecordImages    MedicalRecordImage[]
 
   @@index([phoneNo], map: "idx_user_phone_no")
   @@index([roleId], map: "idx_user_role")

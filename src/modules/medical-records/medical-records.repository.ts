@@ -16,12 +16,13 @@ export const medicalRecordsRepository = {
   create: (data: Prisma.MedicalRecordUncheckedCreateInput, client: PrismaClientOrTx = prisma) =>
     client.medicalRecord.create({ data }),
   findById: (id: string, client: PrismaClientOrTx = prisma) =>
-    client.medicalRecord.findUnique({ where: { id } }),
+    client.medicalRecord.findUnique({ where: { id }, include: { images: true } }),
   update: (id: string, data: Prisma.MedicalRecordUncheckedUpdateInput, client: PrismaClientOrTx = prisma) =>
     client.medicalRecord.update({ where: { id }, data }),
   listByAnimal: (animalId: string, client: PrismaClientOrTx = prisma) =>
     client.medicalRecord.findMany({
       where: { animalId },
       orderBy: { createdAt: 'desc' },
+      include: { images: true },
     }),
 };
