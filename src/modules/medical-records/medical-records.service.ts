@@ -20,6 +20,13 @@ const assertVetHospitalMemberExists = async (memberId: string) => {
   }
 };
 
+const assertVetHospitalExists = async (vetHospitalId: string) => {
+  const vetHospital = await medicalRecordsRepository.findVetHospitalById(vetHospitalId);
+  if (!vetHospital) {
+    throw new NotFoundError(`Vet hospital ${vetHospitalId} not found`);
+  }
+};
+
 const assertMedicalRecordTypeExists = async (medicalRecordTypeId: number) => {
   const type = await medicalRecordsRepository.findTypeById(medicalRecordTypeId);
   if (!type) {
@@ -30,7 +37,7 @@ const assertMedicalRecordTypeExists = async (medicalRecordTypeId: number) => {
 export const medicalRecordsService = {
   addVaccinationRecord: async (animalId: string, input: CreateVaccinationRecordInput, createdBy: string) => {
     await assertAnimalExists(animalId);
-    await assertVetHospitalMemberExists(input.prescribedBy);
+    await assertVetHospitalExists(input.prescribedBy);
     await assertMedicalRecordTypeExists(input.medicalRecordTypeId);
     return medicalRecordsRepository.create({
       ...input,
@@ -52,7 +59,7 @@ export const medicalRecordsService = {
   updateVaccinationRecord: async (id: string, input: UpdateVaccinationRecordInput) => {
     await medicalRecordsService.getById(id);
     if (input.prescribedBy) {
-      await assertVetHospitalMemberExists(input.prescribedBy);
+      await assertVetHospitalExists(input.prescribedBy);
     }
     if (input.medicalRecordTypeId) {
       await assertMedicalRecordTypeExists(input.medicalRecordTypeId);
