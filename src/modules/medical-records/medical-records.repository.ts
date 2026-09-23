@@ -13,6 +13,8 @@ export const medicalRecordsRepository = {
     client.animal.findUnique({ where: { id: animalId } }),
   findVetHospitalMemberById: (id: string, client: PrismaClientOrTx = prisma) =>
     client.vetHospitalMember.findUnique({ where: { id } }),
+  findVetHospitalById: (id: string, client: PrismaClientOrTx = prisma) =>
+    client.vetHospital.findUnique({ where: { id } }),
   create: (data: Prisma.MedicalRecordUncheckedCreateInput, client: PrismaClientOrTx = prisma) =>
     client.medicalRecord.create({ data }),
   findById: (id: string, client: PrismaClientOrTx = prisma) =>

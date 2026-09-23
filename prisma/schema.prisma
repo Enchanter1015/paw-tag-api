@@ -109,7 +109,7 @@ model MedicalRecord {
   animal              Animal               @relation(fields: [animalId], references: [id], onDelete: Cascade)
   creator             User                 @relation(fields: [createdBy], references: [id])
   medicalRecordType   MedicalRecordType    @relation(fields: [medicalRecordTypeId], references: [id])
-  prescriber          VetHospitalMember    @relation("MedicalRecordPrescriber", fields: [prescribedBy], references: [id])
+  prescribingHospital VetHospital          @relation("MedicalRecordPrescribingHospital", fields: [prescribedBy], references: [id])
   verifier            VetHospitalMember?   @relation("MedicalRecordVerifier", fields: [verifiedBy], references: [id])
   images              MedicalRecordImage[]
 
@@ -213,6 +213,7 @@ model VetHospital {
   creator           User                @relation(fields: [createdBy], references: [id])
   vetHospitalType   VetHospitalType     @relation(fields: [vetHospitalTypeId], references: [id])
   members           VetHospitalMember[]
+  prescribedRecords MedicalRecord[]     @relation("MedicalRecordPrescribingHospital")
 
   @@index([createdBy], map: "idx_vet_hospital_created_by")
   @@index([vetHospitalTypeId], map: "idx_vet_hospital_type")
@@ -222,17 +223,16 @@ model VetHospital {
 }
 
 model VetHospitalMember {
-  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  vetHospitalId     String          @map("vet_hospital_id") @db.Uuid
-  userId            String          @map("user_id") @db.Uuid
-  roleId            Int             @map("role_id")
-  joinedAt          DateTime        @default(now()) @map("joined_at") @db.Timestamptz(6)
-  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
-  prescribedRecords MedicalRecord[] @relation("MedicalRecordPrescriber")
-  verifiedRecords   MedicalRecord[] @relation("MedicalRecordVerifier")
-  role              Role            @relation(fields: [roleId], references: [id])
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vetHospital       VetHospital     @relation(fields: [vetHospitalId], references: [id], onDelete: Cascade)
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vetHospitalId   String          @map("vet_hospital_id") @db.Uuid
+  userId          String          @map("user_id") @db.Uuid
+  roleId          Int             @map("role_id")
+  joinedAt        DateTime        @default(now()) @map("joined_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+  verifiedRecords MedicalRecord[] @relation("MedicalRecordVerifier")
+  role            Role            @relation(fields: [roleId], references: [id])
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vetHospital     VetHospital     @relation(fields: [vetHospitalId], references: [id], onDelete: Cascade)
 
   @@unique([vetHospitalId, userId])
   @@index([roleId], map: "idx_vhm_role")

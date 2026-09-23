@@ -10,33 +10,33 @@ const { NotFoundError } = await import('../src/lib/errors.js');
 describe('medicalRecordsService.addVaccinationRecord', () => {
   it('creates a record once the animal, prescriber and type exist', async () => {
     const animal = { id: 'a1b2c3d4' };
-    const member = { id: 'member-1' };
+    const vetHospital = { id: 'hospital-1' };
     const type = { id: 6, name: 'Vaccination' };
     const created = { id: 'record-1', animalId: 'a1b2c3d4' };
 
     const findAnimalById = mock.method(medicalRecordsRepository, 'findAnimalById', async () => animal);
-    const findVetHospitalMemberById = mock.method(
+    const findVetHospitalById = mock.method(
       medicalRecordsRepository,
-      'findVetHospitalMemberById',
-      async () => member,
+      'findVetHospitalById',
+      async () => vetHospital,
     );
     const findTypeById = mock.method(medicalRecordsRepository, 'findTypeById', async () => type);
     const create = mock.method(medicalRecordsRepository, 'create', async () => created);
 
-    const input = { title: 'Rabies vaccine', medicalRecordTypeId: 6, prescribedBy: 'member-1' };
+    const input = { title: 'Rabies vaccine', medicalRecordTypeId: 6, prescribedBy: 'hospital-1' };
     const result = await medicalRecordsService.addVaccinationRecord('a1b2c3d4', input, 'user-1');
 
     assert.deepEqual(create.mock.calls[0]!.arguments[0], {
       title: 'Rabies vaccine',
       medicalRecordTypeId: 6,
-      prescribedBy: 'member-1',
+      prescribedBy: 'hospital-1',
       animalId: 'a1b2c3d4',
       createdBy: 'user-1',
     });
     assert.deepEqual(result, created);
 
     findAnimalById.mock.restore();
-    findVetHospitalMemberById.mock.restore();
+    findVetHospitalById.mock.restore();
     findTypeById.mock.restore();
     create.mock.restore();
   });
@@ -48,7 +48,7 @@ describe('medicalRecordsService.addVaccinationRecord', () => {
       () =>
         medicalRecordsService.addVaccinationRecord(
           'missing',
-          { title: 'x', medicalRecordTypeId: 6, prescribedBy: 'member-1' },
+          { title: 'x', medicalRecordTypeId: 6, prescribedBy: 'hospital-1' },
           'user-1',
         ),
       NotFoundError,
@@ -57,13 +57,9 @@ describe('medicalRecordsService.addVaccinationRecord', () => {
     findAnimalById.mock.restore();
   });
 
-  it('throws NotFoundError when the prescriber does not exist', async () => {
+  it('throws NotFoundError when the prescribing vet hospital does not exist', async () => {
     const findAnimalById = mock.method(medicalRecordsRepository, 'findAnimalById', async () => ({ id: 'a1b2c3d4' }));
-    const findVetHospitalMemberById = mock.method(
-      medicalRecordsRepository,
-      'findVetHospitalMemberById',
-      async () => null,
-    );
+    const findVetHospitalById = mock.method(medicalRecordsRepository, 'findVetHospitalById', async () => null);
 
     await assert.rejects(
       () =>
@@ -76,15 +72,15 @@ describe('medicalRecordsService.addVaccinationRecord', () => {
     );
 
     findAnimalById.mock.restore();
-    findVetHospitalMemberById.mock.restore();
+    findVetHospitalById.mock.restore();
   });
 
   it('throws NotFoundError when the medical record type does not exist', async () => {
     const findAnimalById = mock.method(medicalRecordsRepository, 'findAnimalById', async () => ({ id: 'a1b2c3d4' }));
-    const findVetHospitalMemberById = mock.method(
+    const findVetHospitalById = mock.method(
       medicalRecordsRepository,
-      'findVetHospitalMemberById',
-      async () => ({ id: 'member-1' }),
+      'findVetHospitalById',
+      async () => ({ id: 'hospital-1' }),
     );
     const findTypeById = mock.method(medicalRecordsRepository, 'findTypeById', async () => null);
 
@@ -92,14 +88,14 @@ describe('medicalRecordsService.addVaccinationRecord', () => {
       () =>
         medicalRecordsService.addVaccinationRecord(
           'a1b2c3d4',
-          { title: 'x', medicalRecordTypeId: 99, prescribedBy: 'member-1' },
+          { title: 'x', medicalRecordTypeId: 99, prescribedBy: 'hospital-1' },
           'user-1',
         ),
       NotFoundError,
     );
 
     findAnimalById.mock.restore();
-    findVetHospitalMemberById.mock.restore();
+    findVetHospitalById.mock.restore();
     findTypeById.mock.restore();
   });
 });
@@ -169,13 +165,9 @@ describe('medicalRecordsService.updateVaccinationRecord', () => {
     update.mock.restore();
   });
 
-  it('validates the prescriber when it changes', async () => {
+  it('validates the prescribing vet hospital when it changes', async () => {
     const findById = mock.method(medicalRecordsRepository, 'findById', async () => ({ id: 'record-1' }));
-    const findVetHospitalMemberById = mock.method(
-      medicalRecordsRepository,
-      'findVetHospitalMemberById',
-      async () => null,
-    );
+    const findVetHospitalById = mock.method(medicalRecordsRepository, 'findVetHospitalById', async () => null);
 
     await assert.rejects(
       () => medicalRecordsService.updateVaccinationRecord('record-1', { prescribedBy: 'missing' }),
@@ -183,7 +175,7 @@ describe('medicalRecordsService.updateVaccinationRecord', () => {
     );
 
     findById.mock.restore();
-    findVetHospitalMemberById.mock.restore();
+    findVetHospitalById.mock.restore();
   });
 
   it('validates the medical record type when it changes', async () => {
