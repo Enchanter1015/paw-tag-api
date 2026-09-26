@@ -47,6 +47,15 @@ const options: swaggerJsdoc.Options = {
             images: { type: 'array', items: { $ref: '#/components/schemas/AnimalImage' } },
           },
         },
+        DashboardStats: {
+          type: 'object',
+          properties: {
+            totalAnimals: { type: 'integer', example: 42 },
+            vaccinatedAnimals: { type: 'integer', example: 30 },
+            vaccinationDueAnimals: { type: 'integer', example: 5 },
+            recentAnimals: { type: 'array', items: { $ref: '#/components/schemas/Animal' } },
+          },
+        },
         AnimalImage: {
           type: 'object',
           properties: {
