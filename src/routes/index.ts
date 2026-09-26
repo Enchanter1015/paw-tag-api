@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { animalsRouter } from '../modules/animals/animals.routes.js';
 import { authRouter } from '../modules/auth/auth.routes.js';
+import { dashboardRouter } from '../modules/dashboard/dashboard.routes.js';
 import { healthRouter } from '../modules/health/health.routes.js';
 import { imagesRouter } from '../modules/images/images.routes.js';
 import { lookupsRouter } from '../modules/lookups/lookups.routes.js';
@@ -19,3 +20,4 @@ apiRouter.use(usersRouter);
 apiRouter.use(vetHospitalsRouter);
 apiRouter.use(medicalRecordsRouter);
 apiRouter.use(imagesRouter);
+apiRouter.use(dashboardRouter);
