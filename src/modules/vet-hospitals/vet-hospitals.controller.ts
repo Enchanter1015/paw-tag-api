@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import type {
   AddVetHospitalMemberInput,
   CreateVetHospitalInput,
+  SearchVetHospitalsQuery,
   UpdateVetHospitalInput,
   UpdateVetHospitalMemberInput,
 } from './vet-hospitals.schema.js';
@@ -22,8 +23,8 @@ export const getVetHospital = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const searchVetHospitals = asyncHandler(async (req: Request, res: Response) => {
-  const { name } = req.query as { name?: string };
-  const vetHospitals = await vetHospitalsService.search(name);
+  const { name, memberUserId } = req.query as SearchVetHospitalsQuery;
+  const vetHospitals = await vetHospitalsService.search(name, memberUserId);
   res.status(StatusCodes.OK).json(vetHospitals);
 });
 
@@ -47,6 +48,11 @@ export const addVetHospitalMember = asyncHandler(async (req: Request, res: Respo
 export const listVetHospitalMembers = asyncHandler(async (req: Request, res: Response) => {
   const members = await vetHospitalsService.listMembers(req.params.id!);
   res.status(StatusCodes.OK).json(members);
+});
+
+export const listVetHospitalAnimals = asyncHandler(async (req: Request, res: Response) => {
+  const animals = await vetHospitalsService.listAnimals(req.params.id!);
+  res.status(StatusCodes.OK).json(animals);
 });
 
 export const updateVetHospitalMember = asyncHandler(async (req: Request, res: Response) => {

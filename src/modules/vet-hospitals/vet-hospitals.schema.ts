@@ -9,6 +9,14 @@ export const vetHospitalMemberParamsSchema = z.object({
   memberId: z.string().uuid(),
 });
 
+export const searchVetHospitalsQuerySchema = z.object({
+  name: z.string().trim().min(1).optional(),
+  // Filters to vet hospitals the given user is a member of, e.g. for a profile page.
+  memberUserId: z.string().uuid().optional(),
+});
+
+export type SearchVetHospitalsQuery = z.infer<typeof searchVetHospitalsQuerySchema>;
+
 export const createVetHospitalSchema = z.object({
   name: z.string().trim().min(1).max(150),
   phoneNo: z.string().trim().min(1).max(20).optional(),

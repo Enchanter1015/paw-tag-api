@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   addVetHospitalMember,
   getVetHospital,
+  listVetHospitalAnimals,
   listVetHospitalMembers,
   registerVetHospital,
   removeVetHospital,
@@ -14,6 +15,7 @@ import {
 import {
   addVetHospitalMemberSchema,
   createVetHospitalSchema,
+  searchVetHospitalsQuerySchema,
   updateVetHospitalMemberSchema,
   updateVetHospitalSchema,
   vetHospitalIdParamsSchema,
@@ -63,6 +65,10 @@ vetHospitalsRouter.post(
  *       - in: query
  *         name: name
  *         schema: { type: string }
+ *       - in: query
+ *         name: memberUserId
+ *         description: Filters to vet hospitals this user is a member of, e.g. for a profile page.
+ *         schema: { type: string, format: uuid }
  *     responses:
  *       200:
  *         description: Matching vet hospitals
@@ -70,7 +76,7 @@ vetHospitalsRouter.post(
  *           application/json:
  *             schema: { type: array, items: { $ref: '#/components/schemas/VetHospital' } }
  */
-vetHospitalsRouter.get('/vet-hospitals', searchVetHospitals);
+vetHospitalsRouter.get('/vet-hospitals', validate({ query: searchVetHospitalsQuerySchema }), searchVetHospitals);
 
 /**
  * @openapi
@@ -214,6 +220,31 @@ vetHospitalsRouter.get(
   '/vet-hospitals/:id/members',
   validate({ params: vetHospitalIdParamsSchema }),
   listVetHospitalMembers,
+);
+
+/**
+ * @openapi
+ * /vet-hospitals/{id}/animals:
+ *   get:
+ *     summary: List animals registered by a vet hospital's members
+ *     tags: [VetHospitals]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     responses:
+ *       200:
+ *         description: Animals registered by any member of the vet hospital
+ *         content:
+ *           application/json:
+ *             schema: { type: array, items: { $ref: '#/components/schemas/Animal' } }
+ *       404: { description: Vet hospital not found, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+ */
+vetHospitalsRouter.get(
+  '/vet-hospitals/:id/animals',
+  validate({ params: vetHospitalIdParamsSchema }),
+  listVetHospitalAnimals,
 );
 
 /**
