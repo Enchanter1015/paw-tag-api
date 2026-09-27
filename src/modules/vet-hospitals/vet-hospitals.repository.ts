@@ -28,4 +28,11 @@ export const vetHospitalsRepository = {
     client.vetHospitalMember.delete({ where: { id: memberId } }),
   listMembers: (vetHospitalId: string, client: PrismaClientOrTx = prisma) =>
     client.vetHospitalMember.findMany({ where: { vetHospitalId }, orderBy: { joinedAt: 'asc' } }),
+  // Animals registered by any of the given users, i.e. the org's members' registered animals.
+  listAnimalsByCreators: (creatorIds: string[], client: PrismaClientOrTx = prisma) =>
+    client.animal.findMany({
+      where: { createdBy: { in: creatorIds } },
+      orderBy: { name: 'asc' },
+      include: { images: true },
+    }),
 };

@@ -9,6 +9,7 @@ process.env.NODE_ENV = 'test';
 const {
   addVetHospitalMember,
   getVetHospital,
+  listVetHospitalAnimals,
   listVetHospitalMembers,
   registerVetHospital,
   removeVetHospital,
@@ -79,7 +80,23 @@ describe('searchVetHospitals', () => {
     await searchVetHospitals(req, res, () => {});
 
     assert.equal(search.mock.calls[0]!.arguments[0], 'Central');
+    assert.equal(search.mock.calls[0]!.arguments[1], undefined);
     assert.equal((res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.OK);
+
+    search.mock.restore();
+  });
+
+  it('passes memberUserId through to filter by membership', async () => {
+    const results = [{ id: 'vh-1' }];
+    const search = mock.method(vetHospitalsService, 'search', async () => results);
+
+    const req = { query: { memberUserId: 'user-1' } } as unknown as Request;
+    const res = createRes();
+
+    await searchVetHospitals(req, res, () => {});
+
+    assert.equal(search.mock.calls[0]!.arguments[0], undefined);
+    assert.equal(search.mock.calls[0]!.arguments[1], 'user-1');
 
     search.mock.restore();
   });
@@ -151,6 +168,23 @@ describe('listVetHospitalMembers', () => {
     assert.equal((res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.OK);
 
     listMembers.mock.restore();
+  });
+});
+
+describe('listVetHospitalAnimals', () => {
+  it('responds 200 with the animals list', async () => {
+    const animals = [{ id: 'a1' }];
+    const listAnimals = mock.method(vetHospitalsService, 'listAnimals', async () => animals);
+
+    const req = { params: { id: 'vh-1' } } as unknown as Request;
+    const res = createRes();
+
+    await listVetHospitalAnimals(req, res, () => {});
+
+    assert.equal(listAnimals.mock.calls[0]!.arguments[0], 'vh-1');
+    assert.equal((res.status as ReturnType<typeof mock.fn>).mock.calls[0]!.arguments[0], StatusCodes.OK);
+
+    listAnimals.mock.restore();
   });
 });
 

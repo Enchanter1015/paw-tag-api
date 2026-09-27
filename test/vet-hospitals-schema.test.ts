@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import {
   addVetHospitalMemberSchema,
   createVetHospitalSchema,
+  searchVetHospitalsQuerySchema,
   updateVetHospitalMemberSchema,
   updateVetHospitalSchema,
   vetHospitalIdParamsSchema,
@@ -17,6 +18,21 @@ describe('vetHospitalIdParamsSchema', () => {
 
   it('rejects a non-uuid id', () => {
     assert.equal(vetHospitalIdParamsSchema.safeParse({ id: 'nope' }).success, false);
+  });
+});
+
+describe('searchVetHospitalsQuerySchema', () => {
+  it('accepts no filters', () => {
+    assert.equal(searchVetHospitalsQuerySchema.safeParse({}).success, true);
+  });
+
+  it('accepts a valid memberUserId', () => {
+    const result = searchVetHospitalsQuerySchema.safeParse({ memberUserId: '123e4567-e89b-12d3-a456-426614174000' });
+    assert.equal(result.success, true);
+  });
+
+  it('rejects a non-uuid memberUserId', () => {
+    assert.equal(searchVetHospitalsQuerySchema.safeParse({ memberUserId: 'nope' }).success, false);
   });
 });
 

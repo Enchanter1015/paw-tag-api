@@ -47,6 +47,34 @@ describe('vetHospitalsService.getById', () => {
   });
 });
 
+describe('vetHospitalsService.search', () => {
+  it('filters by name and archived status', async () => {
+    const search = mock.method(vetHospitalsRepository, 'search', async () => []);
+
+    await vetHospitalsService.search('Central');
+
+    assert.deepEqual(search.mock.calls[0]!.arguments[0], {
+      isArchived: false,
+      name: { contains: 'Central', mode: 'insensitive' },
+    });
+
+    search.mock.restore();
+  });
+
+  it('filters by memberUserId when given', async () => {
+    const search = mock.method(vetHospitalsRepository, 'search', async () => []);
+
+    await vetHospitalsService.search(undefined, 'user-1');
+
+    assert.deepEqual(search.mock.calls[0]!.arguments[0], {
+      isArchived: false,
+      members: { some: { userId: 'user-1' } },
+    });
+
+    search.mock.restore();
+  });
+});
+
 describe('vetHospitalsService.update', () => {
   it('delegates to the repository', async () => {
     const updated = { id: 'vh-1', name: 'Updated' };
@@ -108,6 +136,52 @@ describe('vetHospitalsService.addMember', () => {
       () => vetHospitalsService.addMember('missing', { userId: 'user-1', roleId: 1 }),
       NotFoundError,
     );
+
+    findById.mock.restore();
+  });
+});
+
+describe('vetHospitalsService.listAnimals', () => {
+  it('lists animals created by any of the org members, deduped', async () => {
+    const members = [
+      { id: 'm1', userId: 'user-1' },
+      { id: 'm2', userId: 'user-2' },
+      { id: 'm3', userId: 'user-1' },
+    ];
+    const animals = [{ id: 'a1', createdBy: 'user-1' }, { id: 'a2', createdBy: 'user-2' }];
+    const findById = mock.method(vetHospitalsRepository, 'findById', async () => ({ id: 'vh-1' }));
+    const listMembers = mock.method(vetHospitalsRepository, 'listMembers', async () => members);
+    const listAnimalsByCreators = mock.method(vetHospitalsRepository, 'listAnimalsByCreators', async () => animals);
+
+    const result = await vetHospitalsService.listAnimals('vh-1');
+
+    assert.deepEqual(listAnimalsByCreators.mock.calls[0]!.arguments[0], ['user-1', 'user-2']);
+    assert.deepEqual(result, animals);
+
+    findById.mock.restore();
+    listMembers.mock.restore();
+    listAnimalsByCreators.mock.restore();
+  });
+
+  it('skips the query and returns an empty list when the org has no members', async () => {
+    const findById = mock.method(vetHospitalsRepository, 'findById', async () => ({ id: 'vh-1' }));
+    const listMembers = mock.method(vetHospitalsRepository, 'listMembers', async () => []);
+    const listAnimalsByCreators = mock.method(vetHospitalsRepository, 'listAnimalsByCreators', async () => []);
+
+    const result = await vetHospitalsService.listAnimals('vh-1');
+
+    assert.equal(listAnimalsByCreators.mock.calls.length, 0);
+    assert.deepEqual(result, []);
+
+    findById.mock.restore();
+    listMembers.mock.restore();
+    listAnimalsByCreators.mock.restore();
+  });
+
+  it('throws NotFoundError when the vet hospital does not exist', async () => {
+    const findById = mock.method(vetHospitalsRepository, 'findById', async () => null);
+
+    await assert.rejects(() => vetHospitalsService.listAnimals('missing'), NotFoundError);
 
     findById.mock.restore();
   });

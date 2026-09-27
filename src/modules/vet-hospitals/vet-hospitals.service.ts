@@ -17,10 +17,11 @@ export const vetHospitalsService = {
     }
     return vetHospital;
   },
-  search: (name?: string) =>
+  search: (name?: string, memberUserId?: string) =>
     vetHospitalsRepository.search({
       isArchived: false,
       ...(name ? { name: { contains: name, mode: 'insensitive' } } : {}),
+      ...(memberUserId ? { members: { some: { userId: memberUserId } } } : {}),
     }),
   update: async (id: string, input: UpdateVetHospitalInput) => {
     // P2025 (not found) is mapped to 404 by the global error handler.
@@ -38,6 +39,15 @@ export const vetHospitalsService = {
   listMembers: async (vetHospitalId: string) => {
     await vetHospitalsService.getById(vetHospitalId);
     return vetHospitalsRepository.listMembers(vetHospitalId);
+  },
+  // Animals registered by any of the org's members.
+  listAnimals: async (vetHospitalId: string) => {
+    const members = await vetHospitalsService.listMembers(vetHospitalId);
+    if (members.length === 0) {
+      return [];
+    }
+    const creatorIds = [...new Set(members.map((member) => member.userId))];
+    return vetHospitalsRepository.listAnimalsByCreators(creatorIds);
   },
   updateMember: async (vetHospitalId: string, memberId: string, input: UpdateVetHospitalMemberInput) => {
     const member = await vetHospitalsRepository.findMemberById(vetHospitalId, memberId);
